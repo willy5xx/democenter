@@ -1,0 +1,60 @@
+{
+  "dashboardType": "demo",
+  "dashboardName": "vendVision Demo Center",
+  "description": "Interactive demo dashboard for showcasing vending machines to potential customers",
+  "machines": [
+    {
+      "id": "all",
+      "name": "All Machines",
+      "description": "Overview of all machines in demo center",
+      "stream": "tapo_dewarped",
+      "icon": "📹",
+      "isDefault": true
+    },
+    {
+      "id": "1",
+      "name": "Machine ",
+      "description": "Focus on Machine ",
+      "stream": "tapo_machine_1",
+      "icon": "1.",
+      "crop": {
+        "width": 346,
+        "height": 586,
+        "x": 612,
+        "y": 176
+      }
+    },
+    {
+      "id": "2",
+      "name": "Machine",
+      "description": "Focus on Machine",
+      "stream": "tapo_machine_2",
+      "icon": "2.",
+      "crop": {
+        "width": 343,
+        "height": 586,
+        "x": 841,
+        "y": 176
+      }
+    },
+    {
+      "id": "3",
+      "name": "minion",
+      "description": "Focus on minion",
+      "stream": "tapo_machine_3",
+      "icon": "🥗",
+      "crop": {
+        "width": 458,
+        "height": 606,
+        "x": 1146,
+        "y": 168
+      }
+    }
+  ],
+  "settings": {
+    "showMachineSelector": true,
+    "allowUrlParameters": true,
+    "defaultMachine": "all",
+    "transitionDuration": 300
+  }
+}

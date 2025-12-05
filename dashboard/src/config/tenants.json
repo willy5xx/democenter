@@ -1,0 +1,155 @@
+{
+  "redbull": {
+    "id": "redbull",
+    "name": "Red Bull",
+    "displayName": "Red Bull",
+    "subscriptionTier": "pro",
+    "theme": {
+      "primary": "#E40521",
+      "secondary": "#FFD100",
+      "accent": "#0051A5",
+      "background": "#FAFAFA",
+      "surface": "#FFFFFF",
+      "text": "#1A1A1A",
+      "textSecondary": "#6B6B6B",
+      "success": "#FFD100",
+      "gradient": "linear-gradient(135deg, #E40521 0%, #FFD100 50%, #0051A5 100%)",
+      "gradientSubtle": "linear-gradient(to right, rgba(228, 5, 33, 0.03) 0%, rgba(255, 209, 0, 0.03) 50%, rgba(0, 81, 165, 0.03) 100%)"
+    },
+    "branding": {
+      "logo": "/logos/redbull-logo.png",
+      "badgeColor": "gold",
+      "badgeLabel": "PRO",
+      "tagline": "Gives You Wings"
+    },
+    "features": {
+      "demographics": true,
+      "advancedAnalytics": true,
+      "heatmaps": true,
+      "aiInsights": true,
+      "customReports": true,
+      "realtimeAlerts": true,
+      "apiAccess": true,
+      "multiLocation": true
+    },
+    "locations": [
+      {
+        "id": "redbull-nyc-1",
+        "name": "Madison Square Garden",
+        "city": "New York",
+        "state": "NY",
+        "machines": 3
+      },
+      {
+        "id": "redbull-la-1",
+        "name": "Staples Center",
+        "city": "Los Angeles",
+        "state": "CA",
+        "machines": 2
+      }
+    ]
+  },
+  "huel": {
+    "id": "huel",
+    "name": "Huel",
+    "displayName": "Huel",
+    "subscriptionTier": "standard",
+    "theme": {
+      "primary": "#000000",
+      "secondary": "#4A4A4A",
+      "accent": "#8A8A8A",
+      "background": "#FFFFFF",
+      "surface": "#FAFAFA",
+      "text": "#000000",
+      "textSecondary": "#6B6B6B",
+      "success": "#000000",
+      "gradient": "linear-gradient(135deg, #000000 0%, #4A4A4A 100%)",
+      "gradientSubtle": "linear-gradient(to right, rgba(0, 0, 0, 0.02) 0%, rgba(0, 0, 0, 0.01) 100%)"
+    },
+    "branding": {
+      "logo": "/logos/huel-logo.png",
+      "badgeColor": "silver",
+      "badgeLabel": "STANDARD",
+      "tagline": "Complete Nutrition, Complete Data"
+    },
+    "features": {
+      "demographics": false,
+      "advancedAnalytics": false,
+      "heatmaps": false,
+      "aiInsights": false,
+      "customReports": false,
+      "realtimeAlerts": true,
+      "apiAccess": false,
+      "multiLocation": true
+    },
+    "locations": [
+      {
+        "id": "huel-sf-1",
+        "name": "Union Square",
+        "city": "San Francisco",
+        "state": "CA",
+        "machines": 1
+      }
+    ]
+  },
+  "snapfitness": {
+    "id": "snapfitness",
+    "name": "Snap Fitness",
+    "displayName": "Snap Fitness",
+    "subscriptionTier": "standard",
+    "theme": {
+      "primary": "#00A651",
+      "secondary": "#005426",
+      "accent": "#FFD100",
+      "background": "#F5F5F5",
+      "surface": "#FFFFFF",
+      "text": "#1A1A1A",
+      "textSecondary": "#6B6B6B",
+      "success": "#00A651",
+      "gradient": "linear-gradient(135deg, #00A651 0%, #005426 100%)"
+    },
+    "branding": {
+      "logo": "/logos/snapfitness-logo.svg",
+      "badgeColor": "silver",
+      "badgeLabel": "STANDARD",
+      "tagline": "Fast. Convenient. Results."
+    },
+    "features": {
+      "demographics": false,
+      "advancedAnalytics": false,
+      "heatmaps": false,
+      "aiInsights": false,
+      "customReports": false,
+      "realtimeAlerts": true,
+      "apiAccess": false,
+      "multiLocation": true
+    },
+    "locations": [
+      {
+        "id": "snap-minneapolis-1",
+        "name": "Downtown Minneapolis",
+        "city": "Minneapolis",
+        "state": "MN",
+        "machines": 2,
+        "coordinates": { "lat": 44.9778, "lng": -93.2650 }
+      },
+      {
+        "id": "snap-chicago-1",
+        "name": "Chicago Loop",
+        "city": "Chicago",
+        "state": "IL",
+        "machines": 1,
+        "coordinates": { "lat": 41.8781, "lng": -87.6298 }
+      },
+      {
+        "id": "snap-denver-1",
+        "name": "Denver Tech Center",
+        "city": "Denver",
+        "state": "CO",
+        "machines": 1,
+        "coordinates": { "lat": 39.7392, "lng": -104.9903 }
+      }
+    ]
+  }
+}
+

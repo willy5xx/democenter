@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>WebRTC Test</title>
+</head>
+<body>
+  <h1>WebRTC Camera Test</h1>
+  <video id="video" autoplay muted playsinline style="width: 100%; max-width: 800px; border: 2px solid #000;"></video>
+  <div id="status" style="margin-top: 20px; font-family: monospace;"></div>
+
+  <script>
+    const video = document.getElementById('video');
+    const status = document.getElementById('status');
+
+    function log(msg) {
+      console.log(msg);
+      status.innerHTML += msg + '<br>';
+    }
+
+    async function startStream() {
+      try {
+        log('🎥 Creating peer connection...');
+        
+        const pc = new RTCPeerConnection({
+          iceServers: [{ urls: 'stun:stun.l.google.com:19302' }]
+        });
+
+        pc.addTransceiver('video', { direction: 'recvonly' });
+        pc.addTransceiver('audio', { direction: 'recvonly' });
+
+        pc.ontrack = (event) => {
+          log('✅ Got track: ' + event.track.kind);
+          if (video && event.streams[0]) {
+            video.srcObject = event.streams[0];
+            log('✅ Video srcObject set!');
+          }
+        };
+
+        pc.onconnectionstatechange = () => {
+          log('🔗 Connection state: ' + pc.connectionState);
+        };
+
+        pc.onicecandidateerror = (e) => {
+          log('❌ ICE error: ' + e.errorText);
+        };
+
+        const offer = await pc.createOffer();
+        await pc.setLocalDescription(offer);
+        log('📤 Created offer');
+
+        // Wait for ICE gathering
+        await new Promise((resolve) => {
+          if (pc.iceGatheringState === 'complete') {
+            resolve();
+          } else {
+            setTimeout(() => {
+              log('⏰ ICE timeout, proceeding...');
+              resolve();
+            }, 2000);
+            pc.onicegatheringstatechange = () => {
+              log('🧊 ICE state: ' + pc.iceGatheringState);
+              if (pc.iceGatheringState === 'complete') resolve();
+            };
+          }
+        });
+
+        log('📡 Sending to go2rtc...');
+        const response = await fetch('/api/webrtc?src=tapo_dewarped', {
+          method: 'POST',
+          body: pc.localDescription.sdp,
+          headers: { 'Content-Type': 'application/x-sdp' }
+        });
+
+        if (!response.ok) {
+          throw new Error('HTTP ' + response.status);
+        }
+
+        const answer = await response.text();
+        log('📥 Got answer (' + answer.length + ' bytes)');
+        
+        await pc.setRemoteDescription({
+          type: 'answer',
+          sdp: answer
+        });
+
+        log('✅ WebRTC setup complete!');
+        log('⏳ Waiting for video...');
+
+        video.onloadeddata = () => {
+          log('📺 VIDEO LOADED! Ready state: ' + video.readyState);
+        };
+
+        video.onplay = () => {
+          log('▶️ VIDEO PLAYING!');
+        };
+
+      } catch (err) {
+        log('❌ ERROR: ' + err.message);
+        console.error(err);
+      }
+    }
+
+    startStream();
+  </script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,7 @@
+node_modules/
+*.log
+.env
+db/config.db
+db/config.db-shm
+db/config.db-wal
+

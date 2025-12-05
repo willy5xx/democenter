@@ -1,0 +1,21 @@
+{
+  "name": "vendvision-backend",
+  "version": "1.0.0",
+  "description": "Backend API for vendVision configuration",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "db:migrate": "node db/migrate.js",
+    "db:seed": "node db/seed.js",
+    "go2rtc:generate": "node scripts/generate-go2rtc-config.js",
+    "obs:setup": "node scripts/setup-obs.js"
+  },
+  "dependencies": {
+    "better-sqlite3": "^9.6.0",
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "js-yaml": "^4.1.0"
+  }
+}

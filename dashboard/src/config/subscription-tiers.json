@@ -1,0 +1,54 @@
+{
+  "pro": {
+    "name": "Pro",
+    "badgeColor": "gold",
+    "features": [
+      "Advanced Demographics",
+      "AI-Powered Insights",
+      "Customer Heatmaps",
+      "Custom Reports",
+      "Real-time Alerts",
+      "API Access",
+      "Multi-location Support",
+      "Priority Support",
+      "Data Export (CSV/PDF)",
+      "Unlimited Users"
+    ],
+    "analytics": {
+      "realtime": true,
+      "historical": "unlimited",
+      "exports": true,
+      "customDashboards": true
+    }
+  },
+  "standard": {
+    "name": "Standard",
+    "badgeColor": "silver",
+    "features": [
+      "Basic Analytics",
+      "Real-time Alerts",
+      "Multi-location Support",
+      "Standard Reports",
+      "Email Support",
+      "Up to 5 Users"
+    ],
+    "analytics": {
+      "realtime": true,
+      "historical": "30-days",
+      "exports": false,
+      "customDashboards": false
+    }
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+

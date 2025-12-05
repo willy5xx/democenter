@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>vendVision - Demo Viewer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0a0a0a;
+            color: #ffffff;
+            overflow: hidden;
+        }
+
+        .container {
+            display: flex;
+            height: 100vh;
+        }
+
+        .main-view {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .status {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .status-badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            font-size: 14px;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: #10b981;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .video-container {
+            flex: 1;
+            position: relative;
+            background: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #video {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .video-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+        }
+
+        .roi-box {
+            position: absolute;
+            border: 3px solid #3b82f6;
+            background: rgba(59, 130, 246, 0.1);
+            pointer-events: all;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .roi-box:hover {
+            border-color: #60a5fa;
+            background: rgba(59, 130, 246, 0.2);
+            transform: scale(1.02);
+        }
+
+        .roi-label {
+            position: absolute;
+            top: -28px;
+            left: 0;
+            background: #3b82f6;
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .controls {
+            background: #1a1a1a;
+            padding: 20px 24px;
+            display: flex;
+            gap: 16px;
+            align-items: center;
+            border-top: 1px solid #2a2a2a;
+        }
+
+        .control-group {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .control-label {
+            font-size: 13px;
+            color: #9ca3af;
+            min-width: 80px;
+        }
+
+        button {
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        button:hover {
+            background: #1d4ed8;
+            transform: translateY(-1px);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button.active {
+            background: #10b981;
+        }
+
+        select {
+            background: #2a2a2a;
+            color: white;
+            border: 1px solid #3a3a3a;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .sidebar {
+            width: 320px;
+            background: #1a1a1a;
+            border-left: 1px solid #2a2a2a;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-section {
+            padding: 20px;
+            border-bottom: 1px solid #2a2a2a;
+        }
+
+        .sidebar-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: #60a5fa;
+        }
+
+        .feature-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px;
+            background: #2a2a2a;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .feature-item:hover {
+            background: #333;
+        }
+
+        .feature-item.active {
+            background: #1e3a8a;
+            border-left: 3px solid #3b82f6;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .stat-box {
+            background: #2a2a2a;
+            padding: 12px;
+            border-radius: 6px;
+        }
+
+        .stat-label {
+            font-size: 11px;
+            color: #9ca3af;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-value {
+            font-size: 20px;
+            font-weight: 600;
+            margin-top: 4px;
+            color: #3b82f6;
+        }
+
+        .notification {
+            position: fixed;
+            top: 80px;
+            right: 24px;
+            background: #10b981;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            opacity: 0;
+            transform: translateY(-20px);
+            transition: all 0.3s;
+            pointer-events: none;
+        }
+
+        .notification.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="main-view">
+            <!-- Header -->
+            <div class="header">
+                <div class="logo">
+                    <div class="logo-icon">📹</div>
+                    <span>vendVision</span>
+                </div>
+                <div class="status">
+                    <div class="status-badge">
+                        <span class="status-dot"></span>
+                        <span>Live</span>
+                    </div>
+                    <div class="status-badge">
+                        <span id="fps">20</span> FPS
+                    </div>
+                    <div class="status-badge">
+                        <span id="quality">1080p</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Video Container -->
+            <div class="video-container">
+                <video id="video" autoplay muted playsinline></video>
+                <div class="video-overlay" id="overlay">
+                    <!-- ROI boxes will be added here -->
+                </div>
+            </div>
+
+            <!-- Controls -->
+            <div class="controls">
+                <div class="control-group">
+                    <span class="control-label">View Mode:</span>
+                    <select id="streamSelect">
+                        <option value="tapo_dewarped">🎯 Dewarped (Recommended)</option>
+                        <option value="tapo_enhanced">✨ Enhanced Quality</option>
+                        <option value="tapo_closeup">🔍 Close-up View</option>
+                        <option value="tapo_main">📷 Raw Camera</option>
+                    </select>
+                </div>
+                <button id="screenshotBtn">📸 Screenshot</button>
+                <button id="roiBtn">🎯 Toggle ROI</button>
+                <button id="fullscreenBtn">⛶ Fullscreen</button>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-section">
+                <div class="sidebar-title">Quick Features</div>
+                <div class="feature-list">
+                    <div class="feature-item active" data-feature="dewarped">
+                        <span>📐 Lens Correction</span>
+                        <span>✓</span>
+                    </div>
+                    <div class="feature-item" data-feature="roi">
+                        <span>🎯 Region Focus</span>
+                        <span>○</span>
+                    </div>
+                    <div class="feature-item" data-feature="snapshot">
+                        <span>📸 Quick Capture</span>
+                        <span>○</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sidebar-section">
+                <div class="sidebar-title">Stream Stats</div>
+                <div class="stats">
+                    <div class="stat-box">
+                        <div class="stat-label">Resolution</div>
+                        <div class="stat-value">1080p</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">FPS</div>
+                        <div class="stat-value">20</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">Latency</div>
+                        <div class="stat-value">~150ms</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">Protocol</div>
+                        <div class="stat-value">WebRTC</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sidebar-section">
+                <div class="sidebar-title">Product ROIs</div>
+                <div class="feature-list">
+                    <div class="feature-item" onclick="focusROI('machine')">
+                        <span>💻 Machine Display</span>
+                        <span>→</span>
+                    </div>
+                    <div class="feature-item" onclick="focusROI('product')">
+                        <span>📦 Product Area</span>
+                        <span>→</span>
+                    </div>
+                    <div class="feature-item" onclick="focusROI('full')">
+                        <span>🏢 Full View</span>
+                        <span>→</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification -->
+    <div class="notification" id="notification"></div>
+
+    <!-- WebRTC Script -->
+    <script src="http://localhost:1984/webrtc.js"></script>
+    <script>
+        const video = document.getElementById('video');
+        const streamSelect = document.getElementById('streamSelect');
+        const roiBtn = document.getElementById('roiBtn');
+        const screenshotBtn = document.getElementById('screenshotBtn');
+        const fullscreenBtn = document.getElementById('fullscreenBtn');
+        const overlay = document.getElementById('overlay');
+        const notification = document.getElementById('notification');
+        
+        let currentStream = 'tapo_dewarped';
+        let roiVisible = false;
+        let webrtc;
+
+        // Initialize stream
+        function initStream(streamName) {
+            currentStream = streamName;
+            
+            if (webrtc) {
+                webrtc.destroy();
+            }
+            
+            webrtc = new WebRTCPlayer(video, {
+                src: streamName
+            });
+            
+            showNotification(`Switched to: ${streamName}`);
+        }
+
+        // Stream selection
+        streamSelect.addEventListener('change', (e) => {
+            initStream(e.target.value);
+        });
+
+        // Screenshot
+        screenshotBtn.addEventListener('click', () => {
+            const canvas = document.createElement('canvas');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            canvas.getContext('2d').drawImage(video, 0, 0);
+            
+            canvas.toBlob((blob) => {
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `vendvision-${Date.now()}.png`;
+                a.click();
+                URL.revokeObjectURL(url);
+                
+                showNotification('Screenshot saved!');
+            });
+        });
+
+        // ROI Toggle
+        roiBtn.addEventListener('click', () => {
+            roiVisible = !roiVisible;
+            overlay.style.display = roiVisible ? 'block' : 'none';
+            roiBtn.classList.toggle('active', roiVisible);
+            
+            if (roiVisible && overlay.children.length === 0) {
+                createROIs();
+            }
+        });
+
+        // Fullscreen
+        fullscreenBtn.addEventListener('click', () => {
+            if (!document.fullscreenElement) {
+                document.querySelector('.video-container').requestFullscreen();
+            } else {
+                document.exitFullscreen();
+            }
+        });
+
+        // Create demo ROI boxes
+        function createROIs() {
+            const rois = [
+                { name: 'Machine Display', x: 45, y: 35, w: 10, h: 25 },
+                { name: 'Product Area', x: 35, y: 55, w: 30, h: 25 },
+                { name: 'Window View', x: 70, y: 20, w: 25, h: 30 }
+            ];
+
+            rois.forEach(roi => {
+                const box = document.createElement('div');
+                box.className = 'roi-box';
+                box.style.left = roi.x + '%';
+                box.style.top = roi.y + '%';
+                box.style.width = roi.w + '%';
+                box.style.height = roi.h + '%';
+                
+                const label = document.createElement('div');
+                label.className = 'roi-label';
+                label.textContent = roi.name;
+                box.appendChild(label);
+                
+                box.onclick = () => {
+                    showNotification(`Focusing on: ${roi.name}`);
+                };
+                
+                overlay.appendChild(box);
+            });
+        }
+
+        // Focus ROI
+        function focusROI(type) {
+            if (type === 'machine') {
+                initStream('tapo_closeup');
+            } else if (type === 'full') {
+                initStream('tapo_dewarped');
+            }
+        }
+
+        // Show notification
+        function showNotification(message) {
+            notification.textContent = message;
+            notification.classList.add('show');
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 2000);
+        }
+
+        // Initialize on load
+        initStream(currentStream);
+    </script>
+</body>
+</html>
+
