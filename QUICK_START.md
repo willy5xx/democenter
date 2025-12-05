@@ -120,14 +120,6 @@ curl 'http://localhost:3001/api/machine-regions?site_id=1'
 
 ---
 
-## 📚 More Info
-
-- **Full Documentation**: See `VIRTUAL_PTZ_UPGRADE.md`
-- **Implementation Summary**: See `IMPLEMENTATION_SUMMARY.md`
-- **API Reference**: In `VIRTUAL_PTZ_UPGRADE.md`
-
----
-
 ## ⚡ Keyboard Shortcuts
 
 - `Cmd/Ctrl + Shift + D` - Toggle dev settings panel
@@ -150,5 +142,5 @@ curl 'http://localhost:3001/api/machine-regions?site_id=1'
 
 ---
 
-**Questions?** Check `VIRTUAL_PTZ_UPGRADE.md` for detailed docs!
+**Questions?** Check `README.md` for detailed docs!
 

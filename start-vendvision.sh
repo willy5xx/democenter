@@ -9,9 +9,38 @@ echo "🚀 Starting vendVision..."
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd "$DIR"
 
+# --- Prerequisite Checks ---
+MISSING_DEPS=0
+
+if [ ! -f "./go2rtc" ]; then
+    echo "❌ Error: go2rtc binary not found."
+    MISSING_DEPS=1
+fi
+
+if [ ! -d "backend/node_modules" ]; then
+    echo "❌ Error: backend dependencies not found."
+    MISSING_DEPS=1
+fi
+
+if [ ! -d "dashboard/node_modules" ]; then
+    echo "❌ Error: dashboard dependencies not found."
+    MISSING_DEPS=1
+fi
+
+if [ $MISSING_DEPS -eq 1 ]; then
+    echo ""
+    echo "⚠️  Some dependencies are missing."
+    echo "Please run ./setup-demo.sh to install them first."
+    echo ""
+    exit 1
+fi
+# ---------------------------
+
 # 1. Start go2rtc
 echo "📹 Starting go2rtc streaming server..."
 pkill go2rtc 2>/dev/null
+# Ensure it's executable
+chmod +x ./go2rtc
 ./go2rtc -config go2rtc.yaml &
 sleep 2
 
@@ -53,4 +82,3 @@ echo "🔌 Backend API:   http://localhost:3001"
 echo ""
 echo "💡 Tip: Wait ~5 seconds for all services to fully start"
 echo ""
-

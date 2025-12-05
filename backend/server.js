@@ -66,7 +66,7 @@ app.get('/', (req, res) => {
       config: '/api/config',
       obs: '/api/obs'
     },
-    documentation: 'See VIRTUAL_PTZ_UPGRADE.md for full API docs',
+    documentation: 'See README.md for full API docs',
     frontend: 'http://localhost:5173',
     calibration: 'http://localhost:5173/admin/calibrate'
   });

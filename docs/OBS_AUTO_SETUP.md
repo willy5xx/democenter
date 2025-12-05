@@ -28,7 +28,7 @@ This automation system configures OBS Studio to capture your vendVision browser 
 Choose one of three methods:
 
 #### **Option A: Dashboard UI (Easiest)**
-1. Start vendVision: `./start-dev.sh`
+1. Start vendVision: `../start-vendvision.sh`
 2. Open dashboard: `http://localhost:5173/admin`
 3. Click the "OBS Setup" tab
 4. Click "Auto-Configure OBS"
@@ -306,9 +306,7 @@ The setup uses machine regions from your calibration:
 
 ### Documentation
 - [OBS Studio Documentation](https://obsproject.com/kb)
-- [vendVision Virtual PTZ Guide](./VIRTUAL_PTZ_UPGRADE.md)
 - [Zoom Virtual Camera Guide](./ZOOM_VIRTUAL_CAMERA_GUIDE.md)
-- [Camera Setup Guide](./AUTOMATED_CAMERA_SETUP.md)
 
 ### Scripts Included
 - `setup-obs.sh` - Bash script for Mac/Linux

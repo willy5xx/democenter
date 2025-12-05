@@ -73,7 +73,7 @@ The setup wizard handles this automatically, but you can re-run it with:
 ./setup-obs.sh
 ```
 
-See `ZOOM_VIRTUAL_CAMERA_GUIDE.md` for detailed instructions.
+See `docs/ZOOM_VIRTUAL_CAMERA_GUIDE.md` for detailed instructions.
 
 ---
 
@@ -157,8 +157,8 @@ docker-compose -f docker-compose.demo.yml up -d
 ## 📚 Documentation
 
 - `QUICK_START.md` - Detailed quick start guide
-- `OBS_AUTO_SETUP.md` - Automated OBS configuration
-- `ZOOM_VIRTUAL_CAMERA_GUIDE.md` - Virtual camera for Zoom
+- `docs/OBS_AUTO_SETUP.md` - Automated OBS configuration
+- `docs/ZOOM_VIRTUAL_CAMERA_GUIDE.md` - Virtual camera for Zoom
 - `dashboard/DEMO_USAGE.md` - How to run demos
 - `dashboard/CAMERA_DISCOVERY.md` - Camera setup details
 

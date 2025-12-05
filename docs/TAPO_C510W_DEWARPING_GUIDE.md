@@ -25,7 +25,7 @@ These values are optimized for the C510W's mild fisheye lens and will straighten
 ### Step 1: Open the Admin Panel
 ```bash
 # Make sure your system is running
-./start-vendvision.sh
+../start-vendvision.sh
 
 # Then open in your browser:
 http://localhost:5173/admin/sites
@@ -233,7 +233,5 @@ cy = mtx[1][2] / image_height
 ---
 
 Need help? Check the main documentation:
-- `AUTOMATED_CAMERA_SETUP.md` - Camera type presets
-- `VIRTUAL_PTZ_UPGRADE.md` - How virtual PTZ works with dewarping
-- `QUICK_START.md` - Getting started guide
+- `../QUICK_START.md` - Getting started guide
 

@@ -243,7 +243,7 @@ Troubleshooting:
 
 Need Help?
 ----------
-See ZOOM_VIRTUAL_CAMERA_GUIDE.md for full documentation
+See docs/ZOOM_VIRTUAL_CAMERA_GUIDE.md for full documentation
 EOF
 
 echo "✅ Created reference guide"
@@ -255,7 +255,7 @@ echo ""
 echo "Next steps:"
 echo ""
 echo "1. Start your vendVision services:"
-echo "   ./start-dev.sh"
+echo "   ./start-vendvision.sh"
 echo ""
 echo "2. Launch OBS Studio"
 echo "   - You'll see the 'vendVision Demo' scene ready to go"
