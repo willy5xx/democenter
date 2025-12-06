@@ -2,6 +2,27 @@
 
 Interactive camera dashboard for showcasing vendVision capabilities. Set up your camera streaming in minutes!
 
+---
+
+## 🎯 For Salespeople - Quick Reference
+
+**First Time Setup (one time only):**
+```bash
+./setup-demo.sh          # Enter camera IP, username, password when prompted
+./verify-setup.sh        # Check everything is configured
+./start-vendvision.sh    # Start the demo
+```
+
+**Every Other Time:**
+```bash
+./start-vendvision.sh    # Just run this!
+```
+
+**Dashboard:** http://localhost:5173  
+**If camera doesn't work:** See the [troubleshooting section](#-troubleshooting) below
+
+---
+
 ## Prerequisites
 
 Before you begin, make sure you have:
@@ -31,13 +52,30 @@ This will:
 - **Ask for your Tapo Camera IP & credentials**
 - Configure OBS for Zoom virtual camera (optional)
 
-### 3. Start the Demo Center
+### 3. Verify Setup (Optional but Recommended)
+
+```bash
+./verify-setup.sh
+```
+
+This checks that everything is configured correctly before starting.
+
+### 4. Start the Demo Center
 
 ```bash
 ./start-vendvision.sh
 ```
 
 That's it! The dashboard will open at **http://localhost:5173**
+
+### 5. Verify Camera Connection
+
+After starting, check that the camera stream is working:
+
+1. Open http://localhost:1984 (go2rtc admin)
+2. You should see streams named `site1_main` and `site1_dewarped`
+3. Click on `site1_dewarped` to verify the video feed
+4. If you see video here but not in the dashboard, refresh the dashboard page
 
 ---
 
@@ -64,11 +102,10 @@ To stop everything, press `Ctrl+C` in the terminal.
 
 ---
 
-## 🎥 OBS Virtual Camera (For Zoom)
+## 🎥 OBS Virtual Camera (Optional)
 
-Want to use the camera feed in Zoom calls?
+Want to use the camera feed in Zoom calls? This is **optional** for most use cases.
 
-The setup wizard handles this automatically, but you can re-run it with:
 ```bash
 ./setup-obs.sh
 ```
@@ -166,19 +203,56 @@ docker-compose -f docker-compose.demo.yml up -d
 
 ## ❓ Troubleshooting
 
-### Camera not connecting?
-1. Check the camera IP is correct
-2. Verify credentials in `go2rtc.yaml`
-3. Make sure camera is on the same network
+### Camera not connecting (404 error)?
+
+**This is the most common issue!** If you see "404" errors in the browser console:
+
+1. **Check if go2rtc is running:**
+   ```bash
+   # Open http://localhost:1984 in your browser
+   # You should see the go2rtc admin interface
+   ```
+
+2. **Verify stream names match:**
+   ```bash
+   # Look in go2rtc.yaml - you should see:
+   #   site1_main:
+   #   site1_dewarped:
+   # 
+   # If you see just "main:" and "dewarped:" (no site1_ prefix),
+   # regenerate the config:
+   cd backend
+   node scripts/generate-go2rtc-config.js
+   cd ..
+   
+   # Then restart go2rtc:
+   pkill go2rtc
+   ./go2rtc -config go2rtc.yaml &
+   ```
+
+3. **Test the stream directly:**
+   - Go to http://localhost:1984
+   - Click on `site1_dewarped` stream
+   - If video shows here but not in dashboard, refresh the dashboard
+
+### Camera credentials wrong?
+1. Edit the database directly or re-run setup:
+   ```bash
+   cd backend
+   node scripts/setup-wizard.js
+   ```
+2. This will update your camera credentials and regenerate go2rtc.yaml
 
 ### go2rtc won't start?
 ```bash
 # Check if port 1984 is in use
 lsof -i :1984
 
-# Re-download go2rtc
-rm go2rtc
-./setup-demo.sh
+# Kill any existing go2rtc process
+pkill go2rtc
+
+# Start it again
+./start-vendvision.sh
 ```
 
 ### Backend errors?

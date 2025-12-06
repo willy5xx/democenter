@@ -87,10 +87,11 @@ fi
 echo ""
 node backend/scripts/setup-wizard.js
 
-# 6. OBS Setup
-echo ""
-echo "🎥 Configuring OBS..."
-./setup-obs.sh
+# 6. OBS Setup (Optional - skipped by default)
+# Uncomment the line below if you need OBS virtual camera for Zoom
+# echo ""
+# echo "🎥 Configuring OBS..."
+# ./setup-obs.sh
 
 echo ""
 echo "✅ Setup Complete!"
