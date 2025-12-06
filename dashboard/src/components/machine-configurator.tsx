@@ -140,7 +140,7 @@ export function MachineConfigurator() {
         console.log("✅ WebRTC setup complete!")
       } catch (err) {
         console.error("❌ Camera setup failed:", err)
-        alert(`Failed to connect to camera: ${err instanceof Error ? err.message : 'Unknown error'}\n\nMake sure go2rtc is running: docker-compose up go2rtc`)
+        alert(`Failed to connect to camera: ${err instanceof Error ? err.message : 'Unknown error'}\n\nMake sure go2rtc is running: ./go2rtc -config go2rtc.yaml`)
       }
     }
 

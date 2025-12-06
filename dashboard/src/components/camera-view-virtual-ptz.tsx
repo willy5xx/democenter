@@ -493,7 +493,7 @@ export function CameraViewVirtualPTZ({
         <CameraOffIcon className="size-12 text-muted-foreground mb-4" />
         <p className="text-sm text-muted-foreground mb-2">{error}</p>
         <p className="text-xs text-muted-foreground">
-          Run: <code className="bg-background px-2 py-1 rounded">docker-compose restart go2rtc</code>
+          Run: <code className="bg-background px-2 py-1 rounded">./go2rtc -config go2rtc.yaml</code>
         </p>
       </div>
     )
