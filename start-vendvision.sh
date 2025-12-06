@@ -94,20 +94,32 @@ echo "└───────────────────────�
 
 # Check for Tailscale remote access
 if command -v tailscale &> /dev/null; then
-    # Check if Tailscale daemon is running, if not start it
-    if ! tailscale status &> /dev/null; then
-        echo "🌐 Starting Tailscale daemon..."
+    # Check if Tailscale is already connected
+    TAILSCALE_IP=$(tailscale ip -4 2>/dev/null)
+    
+    if [ -z "$TAILSCALE_IP" ]; then
+        # Not connected - try to start daemon and connect
+        echo ""
+        echo "🌐 Starting Tailscale for remote access..."
+        
+        # Start daemon if needed (macOS)
         if [[ "$OSTYPE" == "darwin"* ]]; then
-            # macOS - start daemon in background
-            sudo tailscaled 2>/dev/null &
-            sleep 2
+            if ! pgrep -x "tailscaled" > /dev/null; then
+                echo "   Starting Tailscale daemon (may require password)..."
+                sudo tailscaled &
+                sleep 3
+            fi
         fi
-        # Try to connect (will use existing auth if available)
-        sudo tailscale up 2>/dev/null &
+        
+        # Connect to Tailscale
+        echo "   Connecting to Tailscale network..."
+        sudo tailscale up
         sleep 2
+        
+        # Check if we got an IP now
+        TAILSCALE_IP=$(tailscale ip -4 2>/dev/null)
     fi
     
-    TAILSCALE_IP=$(tailscale ip -4 2>/dev/null)
     if [ ! -z "$TAILSCALE_IP" ] && [ "$TAILSCALE_IP" != "" ]; then
         echo ""
         echo "┌─────────────────────────────────────────────────────────────────┐"
@@ -121,8 +133,8 @@ if command -v tailscale &> /dev/null; then
         echo "Share the remote URLs with colleagues on your Tailscale network!"
     else
         echo ""
-        echo "🌐 Tailscale installed but not connected."
-        echo "   Run 'sudo tailscale up' to connect for remote access."
+        echo "⚠️  Tailscale connection failed. Remote access not available."
+        echo "   Try running manually: sudo tailscale up"
     fi
 fi
 
