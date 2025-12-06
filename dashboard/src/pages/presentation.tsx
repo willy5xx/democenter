@@ -180,6 +180,42 @@ export function PresentationPage() {
     setCurrentRegionId(regionId)
   }
 
+  // Keyboard shortcuts: 1 = Full View, 2 = Machine 1, 3 = Machine 2, etc.
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Ignore if user is typing in an input field
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) {
+        return
+      }
+
+      const key = e.key
+      
+      // Only handle number keys 1-9
+      if (!/^[1-9]$/.test(key)) return
+
+      const num = parseInt(key, 10)
+      
+      if (num === 1) {
+        // '1' = Full View
+        handleRegionSwitch(null)
+        toast.success('Full View', { duration: 1500 })
+      } else {
+        // '2' = first machine, '3' = second machine, etc.
+        const sortedRegions = [...machineRegions].sort((a, b) => a.display_order - b.display_order)
+        const regionIndex = num - 2 // '2' maps to index 0
+        
+        if (regionIndex >= 0 && regionIndex < sortedRegions.length) {
+          const region = sortedRegions[regionIndex]
+          handleRegionSwitch(region.id)
+          toast.success(`${region.name}`, { duration: 1500 })
+        }
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [machineRegions])
+
   return (
     <div 
       className="h-screen w-screen bg-gradient-to-b from-gray-950 to-black flex flex-col overflow-hidden"
@@ -215,6 +251,11 @@ export function PresentationPage() {
                 : 'text-white/60 hover:text-white hover:bg-white/10 border-white/5'
             }`}
           >
+            <kbd className={`text-[10px] font-mono px-1 py-0.5 rounded mr-1.5 ${
+              currentRegionId === null 
+                ? 'bg-black/20 text-black' 
+                : 'bg-white/10 text-white/40'
+            }`}>1</kbd>
             <Monitor className={`size-3.5 mr-1.5 ${currentRegionId === null ? "text-black" : "text-white/60"}`} />
             <div className="flex flex-col items-start leading-none gap-0.5">
               <span className="font-semibold tracking-wide">Full View</span>
@@ -224,7 +265,7 @@ export function PresentationPage() {
           {/* Machine Region Buttons */}
           {machineRegions
             .sort((a, b) => a.display_order - b.display_order)
-            .map((region) => (
+            .map((region, index) => (
               <Button
                 key={region.id}
                 variant={currentRegionId === region.id ? "secondary" : "ghost"}
@@ -236,6 +277,11 @@ export function PresentationPage() {
                     : 'text-white/60 hover:text-white hover:bg-white/10 border-white/5'
                 }`}
               >
+                <kbd className={`text-[10px] font-mono px-1 py-0.5 rounded mr-1.5 ${
+                  currentRegionId === region.id 
+                    ? 'bg-black/20 text-black' 
+                    : 'bg-white/10 text-white/40'
+                }`}>{index + 2}</kbd>
                 <VendingMachineIcon className={`size-3.5 mr-1.5 ${currentRegionId === region.id ? "text-black" : "text-white/60"}`} />
                 <div className="flex flex-col items-start leading-none gap-0.5">
                   <span className="font-semibold tracking-wide">{region.name}</span>
