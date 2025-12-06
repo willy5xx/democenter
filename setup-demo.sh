@@ -167,11 +167,81 @@ else
     fi
 fi
 
-# 7. OBS Setup (Optional - skipped by default)
-# Uncomment the line below if you need OBS virtual camera for Zoom
-# echo ""
-# echo "🎥 Configuring OBS..."
-# ./setup-obs.sh
+# 7. OBS Setup for Zoom Virtual Camera
+echo ""
+echo "🎥 OBS Virtual Camera Setup"
+echo "   OBS is required to present vendVision demos in Zoom/Teams calls."
+echo "   It creates a virtual camera that shows your dashboard professionally."
+echo ""
+
+# Check if OBS is already installed
+OBS_INSTALLED=0
+OBS_CONFIG_DIR=""
+
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    if [ -d "/Applications/OBS.app" ]; then
+        OBS_INSTALLED=1
+        OBS_CONFIG_DIR="$HOME/Library/Application Support/obs-studio"
+    fi
+elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
+    if command -v obs &> /dev/null; then
+        OBS_INSTALLED=1
+        OBS_CONFIG_DIR="$HOME/.config/obs-studio"
+    fi
+fi
+
+# Check if vendVision OBS profile already exists
+OBS_CONFIGURED=0
+if [ $OBS_INSTALLED -eq 1 ] && [ -d "$OBS_CONFIG_DIR/basic/profiles/vendVision" ]; then
+    OBS_CONFIGURED=1
+fi
+
+if [ $OBS_INSTALLED -eq 1 ]; then
+    echo "   ✅ OBS Studio is installed"
+    
+    if [ $OBS_CONFIGURED -eq 1 ]; then
+        echo "   ✅ vendVision profile already configured"
+    else
+        read -p "   Configure OBS for vendVision demos? (Y/n) " SETUP_OBS
+        SETUP_OBS=${SETUP_OBS:-Y}
+        
+        if [[ "$SETUP_OBS" =~ ^[Yy]$ ]]; then
+            echo ""
+            ./setup-obs.sh
+        else
+            echo "   Skipped. Run ./setup-obs.sh later if needed."
+        fi
+    fi
+else
+    echo "   ⚠️  OBS Studio is not installed"
+    echo ""
+    read -p "   Would you like instructions to install OBS? (Y/n) " SHOW_OBS_INSTALL
+    SHOW_OBS_INSTALL=${SHOW_OBS_INSTALL:-Y}
+    
+    if [[ "$SHOW_OBS_INSTALL" =~ ^[Yy]$ ]]; then
+        echo ""
+        echo "   📥 Install OBS Studio:"
+        if [[ "$OSTYPE" == "darwin"* ]]; then
+            echo "      1. Download from: https://obsproject.com/download"
+            echo "      2. Install the .dmg file"
+            echo "      3. Launch OBS once to complete initial setup"
+            echo ""
+            read -p "   Open download page in browser? (Y/n) " OPEN_OBS_PAGE
+            OPEN_OBS_PAGE=${OPEN_OBS_PAGE:-Y}
+            if [[ "$OPEN_OBS_PAGE" =~ ^[Yy]$ ]]; then
+                open "https://obsproject.com/download"
+            fi
+        else
+            echo "      Ubuntu/Debian: sudo apt install obs-studio"
+            echo "      Fedora: sudo dnf install obs-studio"
+            echo "      Arch: sudo pacman -S obs-studio"
+        fi
+        echo ""
+        echo "   After installing OBS, run: ./setup-obs.sh"
+    else
+        echo "   Skipped. Install OBS and run ./setup-obs.sh when ready."
+    fi
+fi
 
 echo ""
 echo "✅ Setup Complete!"

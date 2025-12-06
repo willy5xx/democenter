@@ -39,7 +39,7 @@ export function seedDatabase(db) {
         k1: -0.23,
         k2: -0.02
       }),
-      '1920x1080'
+      '2560x1440'  // 2K QHD default
     );
     
     const siteId = siteResult.lastInsertRowid;
@@ -97,7 +97,7 @@ function createDefaultSite(db) {
     'rtsp://placeholder-url',
     'generic',
     JSON.stringify({ cx: 0.5, cy: 0.5, k1: 0, k2: 0 }),
-    '1920x1080'
+    '2560x1440'  // 2K QHD default
   );
   
   console.log('✅ Created default site');

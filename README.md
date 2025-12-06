@@ -29,6 +29,7 @@ Before you begin, make sure you have:
 
 - **macOS or Linux** (Windows not currently supported)
 - **Node.js v18+** - [Download here](https://nodejs.org/)
+- **OBS Studio** (for Zoom/Teams demos) - [Download here](https://obsproject.com/) - The setup script will configure it automatically
 - **Docker Desktop** (optional, for container-based streaming) - [Download here](https://www.docker.com/products/docker-desktop/)
 
 ## 🚀 Quick Start
@@ -50,7 +51,7 @@ This will:
 - Install all dependencies (backend + frontend)
 - Download the streaming server (go2rtc)
 - **Ask for your Tapo Camera IP & credentials**
-- Configure OBS for Zoom virtual camera (optional)
+- Configure OBS for Zoom virtual camera (for demo presentations)
 
 ### 3. Verify Setup (Optional but Recommended)
 
@@ -81,13 +82,14 @@ After starting, check that the camera stream is working:
 
 ## 📍 What You'll See
 
-| URL | Description |
-|-----|-------------|
+| URL / App | Description |
+|-----------|-------------|
 | http://localhost:5173 | Main Dashboard |
 | http://localhost:5173/presentation | Full-screen presentation mode |
 | http://localhost:5173/admin/calibrate | Machine calibration tool |
 | http://localhost:1984 | go2rtc admin (streaming) |
 | http://localhost:3001 | Backend API |
+| OBS Studio | Virtual camera for Zoom (launches automatically) |
 
 ---
 
@@ -102,13 +104,17 @@ To stop everything, press `Ctrl+C` in the terminal.
 
 ---
 
-## 🎥 OBS Virtual Camera (Optional)
+## 🎥 OBS Virtual Camera (For Zoom/Teams Demos)
 
-Want to use the camera feed in Zoom calls? This is **optional** for most use cases.
+OBS Studio creates a virtual camera that lets you share your vendVision dashboard professionally in Zoom/Teams calls - appearing as your webcam feed instead of a screen share.
+
+**The setup script configures OBS automatically.** If you skipped it or need to reconfigure:
 
 ```bash
 ./setup-obs.sh
 ```
+
+When you run `./start-vendvision.sh`, OBS will launch automatically. Just click **"Start Virtual Camera"** in OBS, then select "OBS Virtual Camera" in your Zoom video settings.
 
 See `docs/ZOOM_VIRTUAL_CAMERA_GUIDE.md` for detailed instructions.
 

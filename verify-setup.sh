@@ -87,6 +87,50 @@ else
     echo "    Run: ./start-vendvision.sh"
 fi
 
+# Check OBS installation (for Zoom demos)
+echo ""
+echo "✓ Checking OBS (for Zoom demos)..."
+OBS_INSTALLED=0
+OBS_CONFIG_DIR=""
+
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    if [ -d "/Applications/OBS.app" ]; then
+        OBS_INSTALLED=1
+        OBS_CONFIG_DIR="$HOME/Library/Application Support/obs-studio"
+    fi
+elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
+    if command -v obs &> /dev/null; then
+        OBS_INSTALLED=1
+        OBS_CONFIG_DIR="$HOME/.config/obs-studio"
+    fi
+fi
+
+if [ $OBS_INSTALLED -eq 1 ]; then
+    echo "  ✓ OBS Studio is installed"
+    
+    # Check for vendVision profile
+    if [ -d "$OBS_CONFIG_DIR/basic/profiles/vendVision" ]; then
+        echo "  ✓ vendVision OBS profile configured"
+    else
+        echo "  ⚠️  vendVision OBS profile not found"
+        echo "     Run: ./setup-obs.sh"
+        ERRORS=$((ERRORS + 1))
+    fi
+    
+    # Check for vendVision scene
+    if [ -f "$OBS_CONFIG_DIR/basic/scenes/vendVision.json" ]; then
+        echo "  ✓ vendVision scene collection ready"
+    else
+        echo "  ⚠️  vendVision scene not found"
+        echo "     Run: ./setup-obs.sh"
+    fi
+else
+    echo "  ⚠️  OBS Studio not installed"
+    echo "     OBS is required for Zoom/Teams demos (virtual camera)"
+    echo "     Download from: https://obsproject.com"
+    echo "     Then run: ./setup-obs.sh"
+fi
+
 # Summary
 echo ""
 echo "================================="

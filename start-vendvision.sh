@@ -79,6 +79,44 @@ else
     (cd "$DIR/dashboard" && npm run dev) &
 fi
 
+# 4. Check for OBS and offer to launch
+OBS_INSTALLED=0
+OBS_RUNNING=0
+
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    if [ -d "/Applications/OBS.app" ]; then
+        OBS_INSTALLED=1
+        if pgrep -x "OBS" > /dev/null; then
+            OBS_RUNNING=1
+        fi
+    fi
+elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
+    if command -v obs &> /dev/null; then
+        OBS_INSTALLED=1
+        if pgrep -x "obs" > /dev/null; then
+            OBS_RUNNING=1
+        fi
+    fi
+fi
+
+if [ $OBS_INSTALLED -eq 1 ]; then
+    echo ""
+    if [ $OBS_RUNNING -eq 1 ]; then
+        echo "🎥 OBS is already running"
+        echo "   💡 Remember to click 'Start Virtual Camera' in OBS for Zoom demos"
+    else
+        echo "🎥 Launching OBS Studio..."
+        if [[ "$OSTYPE" == "darwin"* ]]; then
+            open -a "OBS" --args --scene "vendVision Demo" 2>/dev/null &
+        else
+            obs --scene "vendVision Demo" &>/dev/null &
+        fi
+        sleep 2
+        echo "   ✅ OBS launched"
+        echo "   💡 Click 'Start Virtual Camera' in OBS (bottom right) for Zoom demos"
+    fi
+fi
+
 echo ""
 echo "✨ vendVision is starting up!"
 echo ""
@@ -90,6 +128,12 @@ echo "│ 📊 Dashboard:     http://localhost:5173/dashboard               │"
 echo "│ ⚙️  Admin:         http://localhost:5173/admin                   │"
 echo "│ 🎛️  go2rtc:        http://localhost:1984                         │"
 echo "│ 🔌 Backend API:   http://localhost:3001                         │"
+echo "├─────────────────────────────────────────────────────────────────┤"
+if [ $OBS_INSTALLED -eq 1 ]; then
+echo "│ 🎥 OBS Virtual Camera: Ready (click 'Start Virtual Camera')    │"
+else
+echo "│ 🎥 OBS: Not installed - run ./setup-obs.sh for Zoom demos      │"
+fi
 echo "└─────────────────────────────────────────────────────────────────┘"
 
 # Check for Tailscale remote access

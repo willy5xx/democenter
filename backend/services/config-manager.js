@@ -89,8 +89,8 @@ class ConfigManager {
           filters.push(`crop=${crop_width}:${crop_height}:${crop_x}:${crop_y}`);
         }
         
-        // Scale to standard resolution
-        const [width, height] = (site.stream_resolution || '1920x1080').split('x');
+        // Scale to standard resolution (default: 2K QHD)
+        const [width, height] = (site.stream_resolution || '2560x1440').split('x');
         filters.push(`scale=${width}:${height}`);
         
         const filterChain = filters.join(',');
