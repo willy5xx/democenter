@@ -41,6 +41,7 @@ backend/db/*.backup
 # Logs
 backend/backend.log
 
-# tailscale key just for storing purpose
-tskey-auth-k9ggHdALqw11CNTRL-bwsJ2Qdmg2cPAvswNkAZ2ch1G9z2BpCe
+# Tailscale keys
+tailscale.key
+tskey-auth-*
 
