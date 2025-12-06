@@ -13,6 +13,7 @@ createRoot(document.getElementById('root')!).render(
       <Routes>
         {/* Page 1: Presentation Mode (Demo) - Full screen camera view */}
         <Route path="/" element={<PresentationPage />} />
+        <Route path="/presentation" element={<PresentationPage />} />
         
         {/* Page 2: Dashboard - Full dashboard with charts, tables, and camera */}
         <Route path="/dashboard" element={<App />} />

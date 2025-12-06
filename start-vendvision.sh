@@ -75,11 +75,33 @@ fi
 echo ""
 echo "✨ vendVision is starting up!"
 echo ""
-echo "📺 Presentation:  http://localhost:5173           (Full-screen camera view)"
-echo "📊 Dashboard:     http://localhost:5173/dashboard (Charts, tables & camera)"
-echo "⚙️  Admin:         http://localhost:5173/admin    (Settings & calibration)"
-echo "🎛️  go2rtc Admin:  http://localhost:1984          (Stream management)"
-echo "🔌 Backend API:   http://localhost:3001"
+echo "┌─────────────────────────────────────────────────────────────────┐"
+echo "│ LOCAL ACCESS                                                    │"
+echo "├─────────────────────────────────────────────────────────────────┤"
+echo "│ 📺 Presentation:  http://localhost:5173                         │"
+echo "│ 📊 Dashboard:     http://localhost:5173/dashboard               │"
+echo "│ ⚙️  Admin:         http://localhost:5173/admin                   │"
+echo "│ 🎛️  go2rtc:        http://localhost:1984                         │"
+echo "│ 🔌 Backend API:   http://localhost:3001                         │"
+echo "└─────────────────────────────────────────────────────────────────┘"
+
+# Check for Tailscale remote access
+if command -v tailscale &> /dev/null; then
+    TAILSCALE_IP=$(tailscale ip -4 2>/dev/null)
+    if [ ! -z "$TAILSCALE_IP" ] && [ "$TAILSCALE_IP" != "" ]; then
+        echo ""
+        echo "┌─────────────────────────────────────────────────────────────────┐"
+        echo "│ 🌐 REMOTE ACCESS (Tailscale)                                    │"
+        echo "├─────────────────────────────────────────────────────────────────┤"
+        echo "│ 📺 Presentation:  http://$TAILSCALE_IP:5173                      │"
+        echo "│ 📊 Dashboard:     http://$TAILSCALE_IP:5173/dashboard            │"
+        echo "│ ⚙️  Admin:         http://$TAILSCALE_IP:5173/admin               │"
+        echo "└─────────────────────────────────────────────────────────────────┘"
+        echo ""
+        echo "Share the remote URLs with colleagues on your Tailscale network!"
+    fi
+fi
+
 echo ""
 echo "💡 Tip: Wait ~5 seconds for all services to fully start"
 echo ""

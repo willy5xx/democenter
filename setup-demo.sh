@@ -87,7 +87,69 @@ fi
 echo ""
 node backend/scripts/setup-wizard.js
 
-# 6. OBS Setup (Optional - skipped by default)
+# 6. Tailscale Remote Access Setup
+echo ""
+echo "🌐 Remote Access Setup (Tailscale)"
+echo "   Tailscale allows remote viewing of your demo streams."
+echo ""
+
+# Check if Tailscale is already installed
+if command -v tailscale &> /dev/null; then
+    echo "✅ Tailscale is already installed"
+    
+    # Check if connected
+    if tailscale status &> /dev/null; then
+        TAILSCALE_IP=$(tailscale ip -4 2>/dev/null || echo "Not connected")
+        echo "   Your Tailscale IP: $TAILSCALE_IP"
+        echo "   Remote users can access your streams at: http://$TAILSCALE_IP:5173"
+    else
+        echo "   Tailscale is installed but not connected."
+        echo "   Run 'sudo tailscale up' to connect."
+    fi
+else
+    echo "   Tailscale is not installed."
+    read -p "   Would you like to install Tailscale for remote access? (y/N) " INSTALL_TAILSCALE
+    
+    if [[ "$INSTALL_TAILSCALE" =~ ^[Yy]$ ]]; then
+        echo ""
+        echo "   Installing Tailscale..."
+        
+        if [[ "$OSTYPE" == "darwin"* ]]; then
+            # macOS
+            if command -v brew &> /dev/null; then
+                brew install tailscale
+            else
+                echo "   ⚠️  Homebrew not found. Please install Tailscale manually:"
+                echo "      https://tailscale.com/download/mac"
+            fi
+        elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
+            # Linux
+            curl -fsSL https://tailscale.com/install.sh | sh
+        fi
+        
+        if command -v tailscale &> /dev/null; then
+            echo "   ✅ Tailscale installed!"
+            echo ""
+            echo "   Starting Tailscale..."
+            sudo tailscale up
+            
+            # Wait for connection
+            sleep 3
+            TAILSCALE_IP=$(tailscale ip -4 2>/dev/null || echo "Not connected")
+            
+            if [ "$TAILSCALE_IP" != "Not connected" ]; then
+                echo ""
+                echo "   ✅ Connected to Tailscale!"
+                echo "   Your Tailscale IP: $TAILSCALE_IP"
+                echo "   Remote users can access your streams at: http://$TAILSCALE_IP:5173"
+            fi
+        fi
+    else
+        echo "   Skipping Tailscale setup. You can install it later if needed."
+    fi
+fi
+
+# 7. OBS Setup (Optional - skipped by default)
 # Uncomment the line below if you need OBS virtual camera for Zoom
 # echo ""
 # echo "🎥 Configuring OBS..."
@@ -95,5 +157,16 @@ node backend/scripts/setup-wizard.js
 
 echo ""
 echo "✅ Setup Complete!"
+echo ""
 echo "Run ./start-vendvision.sh to launch the demo center."
+echo ""
+
+# Show Tailscale IP if available
+if command -v tailscale &> /dev/null && tailscale status &> /dev/null 2>&1; then
+    TAILSCALE_IP=$(tailscale ip -4 2>/dev/null)
+    if [ ! -z "$TAILSCALE_IP" ]; then
+        echo "🌐 Remote Access URL: http://$TAILSCALE_IP:5173"
+        echo "   (Share this with colleagues on your Tailscale network)"
+    fi
+fi
 

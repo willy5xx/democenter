@@ -257,7 +257,7 @@ export function CameraViewVirtualPTZ({
       lastPtzDirection.current = direction
       
       try {
-        await fetch(`http://localhost:3001/api/sites/${site.id}/ptz`, {
+        await fetch(`/api/sites/${site.id}/ptz`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ action: 'move', direction })
@@ -283,7 +283,7 @@ export function CameraViewVirtualPTZ({
         lastPtzDirection.current = null
         
         try {
-          await fetch(`http://localhost:3001/api/sites/${site.id}/ptz`, {
+          await fetch(`/api/sites/${site.id}/ptz`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ action: 'stop' })
@@ -303,7 +303,7 @@ export function CameraViewVirtualPTZ({
       
       // Safety: stop movement on unmount/disable
       if (lastPtzDirection.current && site) {
-        fetch(`http://localhost:3001/api/sites/${site.id}/ptz`, {
+        fetch(`/api/sites/${site.id}/ptz`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ action: 'stop' })

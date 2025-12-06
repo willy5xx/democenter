@@ -118,7 +118,7 @@ cat > "$SCENE_COLLECTION_FILE" << 'EOF'
             "uuid": "vendvision-browser-source-001",
             "id": "browser_source",
             "settings": {
-                "url": "http://localhost:5173",
+                "url": "http://localhost:5173/presentation",
                 "width": 1920,
                 "height": 1080,
                 "fps": 30,
