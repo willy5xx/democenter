@@ -4,7 +4,24 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { CameraViewVirtualPTZ } from "@/components/camera-view-virtual-ptz"
 import { SiteSelector } from "@/components/site-selector"
-import { Maximize, Settings } from "lucide-react"
+import { Maximize, Settings, Monitor } from "lucide-react"
+
+// Custom Vending Machine Icon
+const VendingMachineIcon = ({ className }: { className?: string }) => (
+  <svg 
+    viewBox="0 0 24 24" 
+    fill="none" 
+    stroke="currentColor" 
+    strokeWidth="2" 
+    strokeLinecap="round" 
+    strokeLinejoin="round" 
+    className={className}
+  >
+    <rect x="5" y="2" width="14" height="20" rx="2" />
+    <rect x="8" y="5" width="8" height="10" rx="1" />
+    <path d="M8 19h8" />
+  </svg>
+)
 
 interface MachineRegion {
   id: number
@@ -46,13 +63,9 @@ export function PresentationPage() {
         if (regionsData.success) {
           setMachineRegions(regionsData.data)
           
-          // Set default region if available
-          const defaultRegion = regionsData.data.find((r: MachineRegion) => r.is_default)
-          if (defaultRegion) {
-            setCurrentRegionId(defaultRegion.id)
-          } else {
-            setCurrentRegionId(null)
-          }
+          // Default to Full View (null) instead of the default region
+          // This ensures a consistent starting state on refresh
+          setCurrentRegionId(null)
         }
       } catch (err) {
         console.error('Error fetching regions:', err)
@@ -132,97 +145,85 @@ export function PresentationPage() {
           onRegionChange={setCurrentRegionId}
         />
         
-        {/* Hover Controls - absolute positioned top-right */}
-        <div 
-          className={`absolute top-4 right-4 flex gap-2 transition-opacity duration-300 z-10 ${
-            showControls ? 'opacity-100' : 'opacity-0'
-          }`}
-        >
-          <div className="bg-black/50 backdrop-blur-sm rounded-md border border-white/20 p-1">
+      </div>
+      {/* Bottom Bar - Machine Selector */}
+      <div className="h-16 bg-gray-900/95 backdrop-blur-xl border-t border-white/10 flex-shrink-0 px-4 flex items-center justify-between gap-4">
+        {/* Spacer for balance if needed, or Site Selector could go here */}
+        <div className="flex-1" />
+
+        {/* Center: Region Buttons */}
+        <div className="flex items-center justify-center gap-2 overflow-x-auto no-scrollbar px-2">
+          {/* Full View Button */}
+          <Button
+            variant={currentRegionId === null ? "secondary" : "ghost"}
+            size="sm"
+            onClick={() => handleRegionSwitch(null)}
+            className={`min-w-28 h-10 text-xs transition-all border ${
+              currentRegionId === null 
+                ? 'bg-white text-black shadow-[0_0_10px_rgba(255,255,255,0.25)] border-white' 
+                : 'text-white/60 hover:text-white hover:bg-white/10 border-white/5'
+            }`}
+          >
+            <Monitor className={`size-3.5 mr-1.5 ${currentRegionId === null ? "text-black" : "text-white/60"}`} />
+            <div className="flex flex-col items-start leading-none gap-0.5">
+              <span className="font-semibold tracking-wide">Full View</span>
+            </div>
+          </Button>
+          
+          {/* Machine Region Buttons */}
+          {machineRegions
+            .sort((a, b) => a.display_order - b.display_order)
+            .map((region) => (
+              <Button
+                key={region.id}
+                variant={currentRegionId === region.id ? "secondary" : "ghost"}
+                size="sm"
+                onClick={() => handleRegionSwitch(region.id)}
+                className={`min-w-28 h-10 text-xs transition-all border ${
+                  currentRegionId === region.id 
+                    ? 'bg-white text-black shadow-[0_0_10px_rgba(255,255,255,0.25)] border-white' 
+                    : 'text-white/60 hover:text-white hover:bg-white/10 border-white/5'
+                }`}
+              >
+                <VendingMachineIcon className={`size-3.5 mr-1.5 ${currentRegionId === region.id ? "text-black" : "text-white/60"}`} />
+                <div className="flex flex-col items-start leading-none gap-0.5">
+                  <span className="font-semibold tracking-wide">{region.name}</span>
+                </div>
+              </Button>
+            ))}
+        </div>
+
+        {/* Right: System Controls */}
+        <div className="flex items-center gap-2 flex-1 justify-end">
+          <div className="bg-black/40 rounded-md border border-white/10 px-2 py-0.5">
             <SiteSelector 
               value={siteId} 
               onChange={setSiteId}
-              className="text-white" 
+              className="text-white text-xs h-8 border-none bg-transparent focus:ring-0" 
             />
           </div>
           <Button 
-            variant="secondary" 
-            size="sm" 
+            variant="ghost" 
+            size="icon" 
             onClick={handleFullscreen}
-            className="shadow-lg backdrop-blur-sm bg-black/50 hover:bg-black/70 text-white border-white/20"
+            className="h-9 w-9 text-white/70 hover:text-white hover:bg-white/10 rounded-md"
+            title="Fullscreen"
           >
-            <Maximize className="h-4 w-4 mr-2" />
-            Fullscreen
+            <Maximize className="h-4 w-4" />
           </Button>
           <Button 
-            variant="secondary" 
-            size="sm" 
+            variant="ghost" 
+            size="icon" 
             asChild
-            className="shadow-lg backdrop-blur-sm bg-black/50 hover:bg-black/70 text-white border-white/20"
+            className="h-9 w-9 text-white/70 hover:text-white hover:bg-white/10 rounded-md"
+            title="Settings"
           >
             <Link to="/admin">
-              <Settings className="h-4 w-4 mr-2" />
-              Settings
+              <Settings className="h-4 w-4" />
             </Link>
           </Button>
         </div>
       </div>
-      
-      {/* Bottom Bar - Machine Selector */}
-      {machineRegions.length > 0 && (
-        <div className="h-24 bg-gray-900/90 backdrop-blur-xl border-t border-white/10 flex-shrink-0 px-8">
-          <div className="h-full flex items-center justify-center gap-3">
-            {/* Full View Button */}
-            <Button
-              variant={currentRegionId === null ? "default" : "ghost"}
-              size="lg"
-              onClick={() => handleRegionSwitch(null)}
-              className={`min-w-36 h-14 text-base transition-all ${
-                currentRegionId === null 
-                  ? 'shadow-lg shadow-primary/50 scale-105' 
-                  : 'text-white/70 hover:text-white border-white/10'
-              }`}
-            >
-              <span className="text-2xl mr-2">📹</span>
-              <div className="flex flex-col items-start">
-                <span className="font-semibold">Full View</span>
-                {currentRegionId === null && (
-                  <Badge variant="secondary" className="h-4 px-1.5 text-[10px] mt-0.5">
-                    Active
-                  </Badge>
-                )}
-              </div>
-            </Button>
-            
-            {/* Machine Region Buttons */}
-            {machineRegions
-              .sort((a, b) => a.display_order - b.display_order)
-              .map((region) => (
-                <Button
-                  key={region.id}
-                  variant={currentRegionId === region.id ? "default" : "ghost"}
-                  size="lg"
-                  onClick={() => handleRegionSwitch(region.id)}
-                  className={`min-w-36 h-14 text-base transition-all ${
-                    currentRegionId === region.id 
-                      ? 'shadow-lg shadow-primary/50 scale-105' 
-                      : 'text-white/70 hover:text-white border-white/10'
-                  }`}
-                >
-                  <span className="text-2xl mr-2">{region.icon}</span>
-                  <div className="flex flex-col items-start">
-                    <span className="font-semibold">{region.name}</span>
-                    {currentRegionId === region.id && (
-                      <Badge variant="secondary" className="h-4 px-1.5 text-[10px] mt-0.5">
-                        Active
-                      </Badge>
-                    )}
-                  </div>
-                </Button>
-              ))}
-          </div>
-        </div>
-      )}
     </div>
   )
 }

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { CameraIcon, MaximizeIcon, CameraOffIcon, EyeIcon, EyeOffIcon, Settings, Move } from "lucide-react"
+import { CameraIcon, MaximizeIcon, CameraOffIcon, EyeIcon, EyeOffIcon, Settings, Move, MonitorIcon, ZoomInIcon } from "lucide-react"
 import { DevSettingsPanel } from "@/components/dev-settings-panel"
 
 interface MachineRegion {
@@ -134,12 +134,14 @@ export function CameraViewVirtualPTZ({
           if (regionsData.success) {
             setMachineRegions(regionsData.data)
             
-            // Set default region
-            const defaultRegion = regionsData.data.find((r: MachineRegion) => r.is_default)
-            if (defaultRegion) {
-              setCurrentRegionId(defaultRegion.id)
-            } else {
-              setCurrentRegionId(null)
+            // Set default region ONLY if not controlled externally
+            if (externalRegionId === undefined) {
+              const defaultRegion = regionsData.data.find((r: MachineRegion) => r.is_default)
+              if (defaultRegion) {
+                setCurrentRegionId(defaultRegion.id)
+              } else {
+                setCurrentRegionId(null)
+              }
             }
           }
         }
@@ -759,26 +761,27 @@ export function CameraViewVirtualPTZ({
 
       {/* Machine Selector Buttons - Hide in presentation mode */}
       {!hideControls && machineRegions.length > 0 && (
-        <div className="flex flex-col gap-2 p-3 bg-muted/30 rounded-lg border">
-          <div className="flex items-center gap-2 text-xs text-muted-foreground">
-            <span className="font-medium">📍 Virtual PTZ:</span>
-            <span className="text-xs">Instant zoom with no stream switching</span>
+        <div className="flex flex-col gap-2 p-3 bg-card rounded-lg border shadow-sm">
+          <div className="flex items-center gap-2 text-xs text-muted-foreground mb-1">
+            <MonitorIcon className="size-3.5" />
+            <span className="font-medium">Camera Presets</span>
+            <span className="text-[10px] ml-auto opacity-70">Select a region to zoom</span>
           </div>
-          <div className="flex flex-wrap gap-2">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
             {/* Full View Button */}
             <Button
-              variant={currentRegionId === null ? "default" : "outline"}
+              variant={currentRegionId === null ? "secondary" : "outline"}
               size="sm"
               onClick={() => handleRegionSwitch(null)}
-              className="gap-1.5"
+              className={`justify-start gap-2 h-auto py-2 ${currentRegionId === null ? "bg-secondary border-primary/20" : "hover:bg-muted"}`}
             >
-              <span className="text-base">📹</span>
-              <span>Full View</span>
-              {currentRegionId === null && (
-                <Badge variant="secondary" className="ml-1 h-4 px-1.5 text-[10px]">
-                  Active
-                </Badge>
-              )}
+              <MaximizeIcon className="size-4 text-muted-foreground shrink-0" />
+              <div className="flex flex-col items-start min-w-0">
+                <span className="font-medium text-xs truncate w-full">Full View</span>
+                {currentRegionId === null && (
+                  <span className="text-[10px] text-green-500 font-medium">Active</span>
+                )}
+              </div>
             </Button>
             
             {/* Machine Region Buttons */}
@@ -787,18 +790,18 @@ export function CameraViewVirtualPTZ({
               .map((region) => (
                 <Button
                   key={region.id}
-                  variant={currentRegionId === region.id ? "default" : "outline"}
+                  variant={currentRegionId === region.id ? "secondary" : "outline"}
                   size="sm"
                   onClick={() => handleRegionSwitch(region.id)}
-                  className="gap-1.5"
+                  className={`justify-start gap-2 h-auto py-2 ${currentRegionId === region.id ? "bg-secondary border-primary/20" : "hover:bg-muted"}`}
                 >
-                  <span className="text-base">{region.icon}</span>
-                  <span>{region.name}</span>
-                  {currentRegionId === region.id && (
-                    <Badge variant="secondary" className="ml-1 h-4 px-1.5 text-[10px]">
-                      Active
-                    </Badge>
-                  )}
+                  <ZoomInIcon className="size-4 text-muted-foreground shrink-0" />
+                  <div className="flex flex-col items-start min-w-0">
+                    <span className="font-medium text-xs truncate w-full">{region.name}</span>
+                    {currentRegionId === region.id && (
+                      <span className="text-[10px] text-green-500 font-medium">Active</span>
+                    )}
+                  </div>
                 </Button>
               ))}
           </div>
