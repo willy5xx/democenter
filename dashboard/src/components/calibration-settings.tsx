@@ -113,12 +113,19 @@ export function CalibrationSettings() {
         const offer = await pc.createOffer()
         await pc.setLocalDescription(offer)
 
+        // Wait for ICE gathering with timeout (don't wait forever)
         await new Promise<void>((resolve) => {
           if (pc!.iceGatheringState === "complete") {
             resolve()
           } else {
+            const timeout = setTimeout(() => {
+              console.warn("ICE gathering timed out, proceeding anyway")
+              resolve()
+            }, 2000) // 2 second timeout
+            
             pc!.onicegatheringstatechange = () => {
               if (pc!.iceGatheringState === "complete") {
+                clearTimeout(timeout)
                 resolve()
               }
             }
