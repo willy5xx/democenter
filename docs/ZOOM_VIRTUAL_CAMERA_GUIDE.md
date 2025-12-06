@@ -2,11 +2,13 @@
 
 > Transform your browser-based demo into a virtual webcam for professional Zoom presentations.
 
+> 💡 **Quick Setup:** Run `./setup-obs.sh` to auto-configure OBS, or see [OBS_AUTO_SETUP.md](./OBS_AUTO_SETUP.md) for the full guide.
+
 ---
 
 ## Why This Matters
 
-Instead of awkwardly holding your laptop up to show vending machines on a webcam, you can:
+Instead of awkwardly screen sharing, you can:
 - Share a crisp, professional camera feed directly in Zoom
 - Switch between machine views with one click
 - Look like you have a dedicated production setup
@@ -15,40 +17,17 @@ Instead of awkwardly holding your laptop up to show vending machines on a webcam
 
 ## Method 1: OBS Virtual Camera (Recommended)
 
-### Step 1: Install OBS Studio
-Download from https://obsproject.com (free, works on Mac/Windows/Linux)
+### Automatic Setup (Easiest)
+```bash
+./setup-obs.sh
+```
+This configures OBS with the perfect settings. Then:
+1. Launch OBS Studio
+2. Click **"Start Virtual Camera"** (bottom right)
+3. In Zoom: Settings → Video → Select "OBS Virtual Camera"
 
-### Step 2: Configure OBS
-
-1. **Create a new Scene**
-   - Click `+` under "Scenes" → Name it "vendVision Demo"
-
-2. **Add Browser Source**
-   - Click `+` under "Sources"
-   - Select "Browser"
-   - Name it "Demo Center"
-   - Configure:
-     ```
-     URL: http://localhost:5173
-     Width: 1920
-     Height: 1080
-     ```
-   - Check "Refresh browser when scene becomes active"
-
-3. **Set Output Resolution**
-   - Settings → Video
-   - Base Resolution: 1920x1080
-   - Output Resolution: 1920x1080
-   - FPS: 30
-
-### Step 3: Start Virtual Camera
-- Click **"Start Virtual Camera"** button in OBS (bottom right)
-- OBS is now outputting your browser as a webcam
-
-### Step 4: Select in Zoom
-1. Open Zoom → Settings → Video
-2. Camera dropdown → Select **"OBS Virtual Camera"**
-3. You should see your vendVision presentation as your camera feed
+### Manual Setup
+If you prefer manual configuration, see [OBS_AUTO_SETUP.md](./OBS_AUTO_SETUP.md) for detailed steps.
 
 ### Pro Tips for OBS
 - **Crop if needed**: Right-click source → Transform → Edit Transform

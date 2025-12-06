@@ -3,17 +3,18 @@
 ## 🚀 Starting the System
 
 ```bash
-# 1. Start go2rtc (if not already running)
-cd /Users/willleifker/src/vendVision/packages/demo-center
+# Easiest way - use the startup script:
+./start-vendvision.sh
+
+# Or manually:
+# 1. Start go2rtc
 ./go2rtc -config go2rtc.yaml &
 
 # 2. Start backend
-cd backend
-npm start
+cd backend && npm start
 
-# 3. Start frontend
-cd ../dashboard
-npm run dev
+# 3. Start frontend (new terminal)
+cd dashboard && npm run dev
 ```
 
 ## 🎯 Common Tasks
@@ -66,12 +67,11 @@ npm run go2rtc:generate
 
 ### Camera Authentication Failed (401)?
 ```bash
-# Test credentials
-cd /Users/willleifker/src/vendVision/packages/demo-center
-./test-camera-auth.sh
+# Test credentials manually with ffplay
+ffplay rtsp://username:password@camera-ip:554/stream1
 
-# Or test manually
-ffplay rtsp://user:pass@ip:port/stream1
+# Or re-run the setup wizard to update credentials
+cd backend && node scripts/setup-wizard.js
 ```
 
 ### go2rtc Not Running?
@@ -146,13 +146,7 @@ curl -X POST http://localhost:3001/api/config/regenerate
 - Show automatic stream creation
 - Delete site, show automatic cleanup
 
-## 🔑 Important Credentials
-
-### Current Sites
-```
-Site 1: rtsp://secretlab:tapo123@10.1.10.149:554/stream1 (401 - needs fixing)
-Site 2: rtsp://secretlab:tapo123@10.1.10.193:554/stream1 (working)
-```
+## 🔑 Configuration
 
 ### Ports
 - Frontend: http://localhost:5173

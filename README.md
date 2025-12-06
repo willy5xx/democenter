@@ -202,8 +202,9 @@ docker-compose -f docker-compose.demo.yml up -d
 - `QUICK_START.md` - Detailed quick start guide
 - `docs/OBS_AUTO_SETUP.md` - Automated OBS configuration
 - `docs/ZOOM_VIRTUAL_CAMERA_GUIDE.md` - Virtual camera for Zoom
+- `docs/TAPO_C510W_DEWARPING_GUIDE.md` - Camera dewarping setup
 - `dashboard/DEMO_USAGE.md` - How to run demos
-- `dashboard/CAMERA_DISCOVERY.md` - Camera setup details
+- `dashboard/MULTI_TENANT_GUIDE.md` - Multi-tenant dashboard system
 
 ---
 

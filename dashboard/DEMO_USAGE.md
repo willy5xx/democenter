@@ -11,13 +11,18 @@ This is the **Demo Dashboard** - designed specifically for showing potential cus
 ### 1. Start the System
 
 ```bash
-# Start go2rtc (if not already running)
-cd /Users/willleifker/src/vendVision
-docker-compose up go2rtc -d
+# Easiest way - from project root:
+./start-vendvision.sh
 
-# Start the demo dashboard
-cd web/vendvision-dashboard
-npm run dev
+# Or manually:
+# Terminal 1: Start go2rtc
+./go2rtc -config go2rtc.yaml
+
+# Terminal 2: Start backend
+cd backend && npm start
+
+# Terminal 3: Start frontend
+cd dashboard && npm run dev
 ```
 
 ### 2. Open in Browser
@@ -182,9 +187,9 @@ Link: http://demo.vendvision.com?machine=3
 
 ### **Machine buttons don't work?**
 
-1. Check that go2rtc is running: `docker-compose ps`
+1. Check that go2rtc is running: http://localhost:1984
 2. Verify machine streams exist in `go2rtc.yaml`
-3. Restart go2rtc: `docker-compose restart go2rtc`
+3. Restart go2rtc: `pkill go2rtc && ./go2rtc -config go2rtc.yaml &`
 
 ### **Camera not showing?**
 
@@ -282,15 +287,11 @@ Coming soon: Draw boxes on the camera view to define machine positions
 
 ## 🔗 Related Documentation
 
-- **Architecture Plan:** `/docs/DASHBOARD_ARCHITECTURE.md`
-- **Product Requirements:** `/docs/PRODUCT_REQUIREMENTS.md`
-- **Frontend Plan:** `/docs/FRONTEND_PLAN.md`
+- **Main README:** `../README.md`
+- **Quick Start:** `../QUICK_START.md`
+- **Multi-Tenant Guide:** `./MULTI_TENANT_GUIDE.md`
 
 ---
 
 **Questions?** Check the main README or contact the dev team.
-
----
-
-Last Updated: October 3, 2025
 
