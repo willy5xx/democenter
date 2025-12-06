@@ -95,7 +95,7 @@ sites.forEach((site, index) => {
   
   // FFmpeg stream with optimized settings for low latency
   streams[dewarpedStreamName] = [
-    `ffmpeg:${mainStreamName}#video=h264#raw=-fflags nobuffer+genpts -flags low_delay -probesize 32 -analyzeduration 0 -vf ${filterChain} -c:v libx264 -preset ultrafast -tune zerolatency -crf 23 -g 5 -bf 0 -x264-params keyint=5:min-keyint=5:scenecut=0:bframes=0:ref=1`
+    `ffmpeg:${mainStreamName}#video=h264#raw=-fflags nobuffer+genpts -flags low_delay -probesize 32 -analyzeduration 0 -vf ${filterChain} -c:v libx264 -preset superfast -tune zerolatency -crf 17 -maxrate 8M -bufsize 16M -g 30 -bf 0 -x264-params keyint=30:min-keyint=30:scenecut=0:bframes=0:ref=1`
   ];
 });
 

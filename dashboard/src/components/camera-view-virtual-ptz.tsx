@@ -67,6 +67,14 @@ export function CameraViewVirtualPTZ({
   const [transitionDuration, setTransitionDuration] = useState<number>(300)
   const [showDevSettings, setShowDevSettings] = useState(false)
   
+  // Video enhancements state
+  const [videoSettings, setVideoSettings] = useState({
+    sharpenAmount: 0,
+    contrast: 100,
+    brightness: 100,
+    saturation: 100,
+  })
+  
   // Virtual PTZ transform state
   const [transform, setTransform] = useState({ scale: 1, translateX: 0, translateY: 0 })
 
@@ -162,6 +170,11 @@ export function CameraViewVirtualPTZ({
         setTransitionDuration(parseInt(value))
       } else if (key === 'show_region_boundaries') {
         setShowROI(value === 'true')
+      } else if (key.startsWith('video_')) {
+        setVideoSettings(prev => ({
+          ...prev,
+          [key.replace('video_', '')]: parseInt(value)
+        }))
       }
     }
     
@@ -183,6 +196,12 @@ export function CameraViewVirtualPTZ({
           setTransitionStyle(data.data.transition_style || 'smooth')
           setTransitionDuration(parseInt(data.data.transition_duration) || 300)
           setShowROI(data.data.show_region_boundaries === 'true')
+          setVideoSettings({
+            sharpenAmount: parseInt(data.data.video_sharpen_amount) || 0,
+            contrast: parseInt(data.data.video_contrast) || 100,
+            brightness: parseInt(data.data.video_brightness) || 100,
+            saturation: parseInt(data.data.video_saturation) || 100,
+          })
         }
       } catch (err) {
         console.error('Error fetching settings:', err)
@@ -503,8 +522,26 @@ export function CameraViewVirtualPTZ({
   // Override duration if set via dev settings
   const effectiveDuration = transitionDuration !== 300 ? transitionDuration : currentTransition.duration
 
+  // Calculate sharpen matrix
+  const amount = videoSettings.sharpenAmount / 100
+  // Kernel: 0 -amount 0, -amount 1+4*amount -amount, 0 -amount 0
+  const center = 1 + (4 * amount)
+  const neighbor = -amount
+  const kernelMatrix = `0 ${neighbor} 0 ${neighbor} ${center} ${neighbor} 0 ${neighbor} 0`
+
   return (
     <>
+      <svg className="hidden">
+        <defs>
+          <filter id="sharpen">
+            <feConvolveMatrix
+              order="3,3"
+              preserveAlpha="true"
+              kernelMatrix={kernelMatrix}
+            />
+          </filter>
+        </defs>
+      </svg>
       <DevSettingsPanel isOpen={showDevSettings} onClose={() => setShowDevSettings(false)} />
       
       <div className="flex flex-col h-full gap-3">
@@ -531,7 +568,16 @@ export function CameraViewVirtualPTZ({
             playsInline
             preload="none"
             className="w-full h-full object-contain"
-            style={{ maxWidth: '100%', maxHeight: '100%' }}
+            style={{ 
+              maxWidth: '100%', 
+              maxHeight: '100%',
+              filter: `
+                contrast(${videoSettings.contrast}%) 
+                brightness(${videoSettings.brightness}%) 
+                saturate(${videoSettings.saturation}%)
+                ${videoSettings.sharpenAmount > 0 ? 'url(#sharpen)' : ''}
+              `
+            }}
           />
         </div>
         
