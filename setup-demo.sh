@@ -93,55 +93,73 @@ echo "🌐 Remote Access Setup (Tailscale)"
 echo "   Tailscale allows remote viewing of your demo streams."
 echo ""
 
-# Check if Tailscale is already installed
-if command -v tailscale &> /dev/null; then
-    echo "✅ Tailscale is already installed"
-    
-    # Check if connected
-    if tailscale status &> /dev/null; then
-        TAILSCALE_IP=$(tailscale ip -4 2>/dev/null || echo "Not connected")
+# Check if Tailscale is already installed and connected
+if command -v tailscale &> /dev/null && tailscale status &> /dev/null 2>&1; then
+    TAILSCALE_IP=$(tailscale ip -4 2>/dev/null || echo "")
+    if [ ! -z "$TAILSCALE_IP" ]; then
+        echo "✅ Tailscale is already connected"
         echo "   Your Tailscale IP: $TAILSCALE_IP"
         echo "   Remote users can access your streams at: http://$TAILSCALE_IP:5173"
-    else
-        echo "   Tailscale is installed but not connected."
-        echo "   Run 'sudo tailscale up' to connect."
     fi
 else
-    echo "   Tailscale is not installed."
-    read -p "   Would you like to install Tailscale for remote access? (y/N) " INSTALL_TAILSCALE
+    echo "   Tailscale enables remote camera viewing from anywhere."
+    echo ""
+    read -p "   Would you like to set up Tailscale for remote access? (y/N) " INSTALL_TAILSCALE
     
     if [[ "$INSTALL_TAILSCALE" =~ ^[Yy]$ ]]; then
-        echo ""
-        echo "   Installing Tailscale..."
-        
-        if [[ "$OSTYPE" == "darwin"* ]]; then
-            # macOS
-            if command -v brew &> /dev/null; then
-                brew install tailscale
-            else
-                echo "   ⚠️  Homebrew not found. Please install Tailscale manually:"
-                echo "      https://tailscale.com/download/mac"
+        # Install if not present
+        if ! command -v tailscale &> /dev/null; then
+            echo ""
+            echo "   📦 Installing Tailscale..."
+            
+            if [[ "$OSTYPE" == "darwin"* ]]; then
+                # macOS - install CLI and try to start daemon
+                if command -v brew &> /dev/null; then
+                    brew install tailscale
+                    # Start the daemon
+                    sudo tailscaled 2>/dev/null &
+                    sleep 2
+                else
+                    echo "   ⚠️  Homebrew not found. Please install Tailscale manually:"
+                    echo "      https://tailscale.com/download/mac"
+                fi
+            elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
+                # Linux
+                curl -fsSL https://tailscale.com/install.sh | sh
             fi
-        elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
-            # Linux
-            curl -fsSL https://tailscale.com/install.sh | sh
         fi
         
         if command -v tailscale &> /dev/null; then
             echo "   ✅ Tailscale installed!"
             echo ""
-            echo "   Starting Tailscale..."
-            sudo tailscale up
+            echo "   🔑 To join the VendVision network, you need an auth key."
+            echo "   (Get this from your admin via Slack/Teams)"
+            echo ""
+            read -p "   Enter Tailscale auth key (or press Enter to skip): " TAILSCALE_AUTHKEY
             
-            # Wait for connection
-            sleep 3
-            TAILSCALE_IP=$(tailscale ip -4 2>/dev/null || echo "Not connected")
-            
-            if [ "$TAILSCALE_IP" != "Not connected" ]; then
+            if [ ! -z "$TAILSCALE_AUTHKEY" ]; then
                 echo ""
-                echo "   ✅ Connected to Tailscale!"
-                echo "   Your Tailscale IP: $TAILSCALE_IP"
-                echo "   Remote users can access your streams at: http://$TAILSCALE_IP:5173"
+                echo "   🔗 Connecting to Tailscale network..."
+                
+                # Use auth key for automatic authentication
+                sudo tailscale up --authkey="$TAILSCALE_AUTHKEY"
+                
+                # Wait for connection
+                sleep 3
+                TAILSCALE_IP=$(tailscale ip -4 2>/dev/null || echo "")
+                
+                if [ ! -z "$TAILSCALE_IP" ]; then
+                    echo ""
+                    echo "   ✅ Connected to Tailscale!"
+                    echo "   Your Tailscale IP: $TAILSCALE_IP"
+                    echo "   Remote users can access your streams at: http://$TAILSCALE_IP:5173"
+                else
+                    echo "   ⚠️  Connection may still be pending. Check 'tailscale status'"
+                fi
+            else
+                echo ""
+                echo "   ℹ️  Skipped Tailscale authentication."
+                echo "   You can connect later with: sudo tailscale up --authkey=YOUR_KEY"
             fi
         fi
     else
