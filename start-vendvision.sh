@@ -94,33 +94,28 @@ echo "└───────────────────────�
 
 # Check for Tailscale remote access
 if command -v tailscale &> /dev/null; then
-    # Check if Tailscale is already connected
+    echo ""
+    echo "🌐 Checking Tailscale remote access..."
+    
+    # Check if tailscaled daemon is running
+    if ! pgrep -x "tailscaled" > /dev/null; then
+        echo "   Starting Tailscale daemon (may require password)..."
+        sudo tailscaled > /dev/null 2>&1 &
+        sleep 3
+    fi
+    
+    # Check if connected, if not try to connect
     TAILSCALE_IP=$(tailscale ip -4 2>/dev/null)
     
     if [ -z "$TAILSCALE_IP" ]; then
-        # Not connected - try to start daemon and connect
-        echo ""
-        echo "🌐 Starting Tailscale for remote access..."
-        
-        # Start daemon if needed (macOS)
-        if [[ "$OSTYPE" == "darwin"* ]]; then
-            if ! pgrep -x "tailscaled" > /dev/null; then
-                echo "   Starting Tailscale daemon (may require password)..."
-                sudo tailscaled &
-                sleep 3
-            fi
-        fi
-        
-        # Connect to Tailscale
         echo "   Connecting to Tailscale network..."
         sudo tailscale up
         sleep 2
-        
-        # Check if we got an IP now
         TAILSCALE_IP=$(tailscale ip -4 2>/dev/null)
     fi
     
     if [ ! -z "$TAILSCALE_IP" ] && [ "$TAILSCALE_IP" != "" ]; then
+        echo "   ✅ Connected! IP: $TAILSCALE_IP"
         echo ""
         echo "┌─────────────────────────────────────────────────────────────────┐"
         echo "│ 🌐 REMOTE ACCESS (Tailscale)                                    │"
@@ -128,13 +123,12 @@ if command -v tailscale &> /dev/null; then
         echo "│ 📺 Presentation:  http://$TAILSCALE_IP:5173                      │"
         echo "│ 📊 Dashboard:     http://$TAILSCALE_IP:5173/dashboard            │"
         echo "│ ⚙️  Admin:         http://$TAILSCALE_IP:5173/admin               │"
+        echo "│ 📹 Stream Only:   http://$TAILSCALE_IP:1984                      │"
         echo "└─────────────────────────────────────────────────────────────────┘"
         echo ""
         echo "Share the remote URLs with colleagues on your Tailscale network!"
     else
-        echo ""
-        echo "⚠️  Tailscale connection failed. Remote access not available."
-        echo "   Try running manually: sudo tailscale up"
+        echo "   ⚠️  Tailscale not connected. Run 'sudo tailscale up' manually."
     fi
 fi
 
