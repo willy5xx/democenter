@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { CameraViewVirtualPTZ } from "@/components/camera-view-virtual-ptz"
+import { SiteSelector } from "@/components/site-selector"
 import { Maximize, Settings } from "lucide-react"
 
 interface MachineRegion {
@@ -33,38 +34,50 @@ export function PresentationPage() {
   const [currentRegionId, setCurrentRegionId] = useState<number | null>(null)
   const [showControls, setShowControls] = useState(false)
 
-  // Fetch site and machine regions on mount
+  // Fetch machine regions when siteId changes
   useEffect(() => {
-    const fetchData = async () => {
+    if (!siteId) return
+
+    const fetchRegions = async () => {
       try {
-        // Get first site
-        const sitesRes = await fetch('http://localhost:3001/api/sites')
-        const sitesData = await sitesRes.json()
+        const regionsRes = await fetch(`http://localhost:3001/api/machine-regions?site_id=${siteId}`)
+        const regionsData = await regionsRes.json()
         
-        if (sitesData.success && sitesData.data.length > 0) {
-          const firstSite = sitesData.data[0]
-          setSiteId(firstSite.id)
+        if (regionsData.success) {
+          setMachineRegions(regionsData.data)
           
-          // Get machine regions for this site
-          const regionsRes = await fetch(`http://localhost:3001/api/machine-regions?site_id=${firstSite.id}`)
-          const regionsData = await regionsRes.json()
-          
-          if (regionsData.success) {
-            setMachineRegions(regionsData.data)
-            
-            // Set default region if available
-            const defaultRegion = regionsData.data.find((r: MachineRegion) => r.is_default)
-            if (defaultRegion) {
-              setCurrentRegionId(defaultRegion.id)
-            }
+          // Set default region if available
+          const defaultRegion = regionsData.data.find((r: MachineRegion) => r.is_default)
+          if (defaultRegion) {
+            setCurrentRegionId(defaultRegion.id)
+          } else {
+            setCurrentRegionId(null)
           }
         }
       } catch (err) {
-        console.error('Error fetching data:', err)
+        console.error('Error fetching regions:', err)
+      }
+    }
+
+    fetchRegions()
+  }, [siteId])
+
+  // Initial site fetch
+  useEffect(() => {
+    const fetchInitialSite = async () => {
+      try {
+        const sitesRes = await fetch('http://localhost:3001/api/sites')
+        const sitesData = await sitesRes.json()
+        
+        if (sitesData.success && sitesData.data.length > 0 && !siteId) {
+          setSiteId(sitesData.data[0].id)
+        }
+      } catch (err) {
+        console.error('Error fetching sites:', err)
       }
     }
     
-    fetchData()
+    fetchInitialSite()
   }, [])
 
   // Listen for SSE updates to machine regions
@@ -125,6 +138,13 @@ export function PresentationPage() {
             showControls ? 'opacity-100' : 'opacity-0'
           }`}
         >
+          <div className="bg-black/50 backdrop-blur-sm rounded-md border border-white/20 p-1">
+            <SiteSelector 
+              value={siteId} 
+              onChange={setSiteId}
+              className="text-white" 
+            />
+          </div>
           <Button 
             variant="secondary" 
             size="sm" 
