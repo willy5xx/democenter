@@ -60,7 +60,8 @@ class ConfigManager {
       const streams = {};
 
       sites.forEach((site) => {
-        const sitePrefix = sites.length > 1 ? `site${site.id}_` : '';
+        // Always use site prefix for consistency with frontend
+        const sitePrefix = `site${site.id}_`;
         
         // Parse dewarp parameters
         const dewarpParams = JSON.parse(site.dewarp_params || '{}');
