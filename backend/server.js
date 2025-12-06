@@ -14,6 +14,7 @@ import settingsRouter from './routes/settings.js';
 import sseRouter from './routes/sse.js';
 import configRouter from './routes/config.js';
 import obsSetupRouter from './routes/obs-setup.js';
+import ptzRouter from './routes/ptz.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -50,6 +51,7 @@ app.use('/api/settings', settingsRouter);
 app.use('/api/events', sseRouter);
 app.use('/api/config', configRouter);
 app.use('/api/obs', obsSetupRouter);
+app.use('/api', ptzRouter); // Mount at /api so it matches /api/sites/:id/ptz
 
 // Root endpoint - API info
 app.get('/', (req, res) => {

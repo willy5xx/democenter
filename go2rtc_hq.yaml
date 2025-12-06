@@ -1,0 +1,37 @@
+# go2rtc Configuration - HIGH QUALITY Version
+#
+# Optimized for visual quality over latency
+# Use this when image quality matters more than minimal latency
+#
+# Key changes from default:
+#   - CRF 18 (was 23) - much better quality
+#   - preset "medium" (was ultrafast) - better compression efficiency  
+#   - Higher bitrate cap
+#
+
+streams:
+  site1_main:
+    - rtsp://secretlab:tapo123@10.1.10.193:554/stream1
+  site1_dewarped:
+    - ffmpeg:site1_main#video=h264#raw=-fflags nobuffer+genpts -flags low_delay -probesize 32 -analyzeduration 0 -vf scale=1920:1080 -c:v libx264 -preset fast -tune zerolatency -crf 18 -b:v 8M -maxrate 10M -bufsize 16M -g 30 -bf 0
+  site2_main:
+    - rtsp://secretlab:tapo123@10.1.10.149:554/stream1
+  site2_dewarped:
+    - ffmpeg:site2_main#video=h264#raw=-fflags nobuffer+genpts -flags low_delay -probesize 32 -analyzeduration 0 -vf scale=1920:1080 -c:v libx264 -preset fast -tune zerolatency -crf 18 -b:v 8M -maxrate 10M -bufsize 16M -g 30 -bf 0
+  
+  # BONUS: Passthrough streams (original camera quality, no re-encoding)
+  site1_raw:
+    - rtsp://secretlab:tapo123@10.1.10.193:554/stream1#video=copy
+  site2_raw:
+    - rtsp://secretlab:tapo123@10.1.10.149:554/stream1#video=copy
+
+webrtc:
+  listen: ':8555'
+  ice_servers:
+    - urls:
+        - stun:stun.l.google.com:19302
+api:
+  listen: ':1984'
+log:
+  level: info
+

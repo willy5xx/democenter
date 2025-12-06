@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { CameraIcon, MaximizeIcon, CameraOffIcon, EyeIcon, EyeOffIcon, Settings } from "lucide-react"
+import { CameraIcon, MaximizeIcon, CameraOffIcon, EyeIcon, EyeOffIcon, Settings, Move } from "lucide-react"
 import { DevSettingsPanel } from "@/components/dev-settings-panel"
 
 interface MachineRegion {
@@ -72,6 +72,8 @@ export function CameraViewVirtualPTZ({
   const [transitionStyle, setTransitionStyle] = useState<string>('smooth')
   const [transitionDuration, setTransitionDuration] = useState<number>(300)
   const [showDevSettings, setShowDevSettings] = useState(false)
+  const [isPtzEnabled, setIsPtzEnabled] = useState(false)
+  const lastPtzDirection = useRef<string | null>(null)
   
   // Video enhancements state
   const [videoSettings, setVideoSettings] = useState({
@@ -228,6 +230,85 @@ export function CameraViewVirtualPTZ({
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [])
+
+  // PTZ Control Keyboard Listeners
+  useEffect(() => {
+    if (!isPtzEnabled || !site) return
+
+    const handleKeyDown = async (e: KeyboardEvent) => {
+      // Ignore if repeating (held down) or if modifiers are pressed
+      if (e.repeat || e.metaKey || e.ctrlKey || e.altKey || e.shiftKey) return
+
+      let direction = ''
+      switch (e.key) {
+        case 'ArrowLeft': direction = 'left'; break;
+        case 'ArrowRight': direction = 'right'; break;
+        case 'ArrowUp': direction = 'up'; break;
+        case 'ArrowDown': direction = 'down'; break;
+        default: return;
+      }
+
+      // Prevent scrolling
+      e.preventDefault()
+
+      console.log(`PTZ Move: ${direction}`)
+      lastPtzDirection.current = direction
+      
+      try {
+        await fetch(`http://localhost:3001/api/sites/${site.id}/ptz`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'move', direction })
+        })
+      } catch (err) {
+        console.error('PTZ Error:', err)
+      }
+    }
+
+    const handleKeyUp = async (e: KeyboardEvent) => {
+      let direction = ''
+      switch (e.key) {
+        case 'ArrowLeft': direction = 'left'; break;
+        case 'ArrowRight': direction = 'right'; break;
+        case 'ArrowUp': direction = 'up'; break;
+        case 'ArrowDown': direction = 'down'; break;
+        default: return;
+      }
+      
+      // Only stop if the released key was the one driving the movement
+      if (lastPtzDirection.current === direction) {
+        console.log(`PTZ Stop (released ${direction})`)
+        lastPtzDirection.current = null
+        
+        try {
+          await fetch(`http://localhost:3001/api/sites/${site.id}/ptz`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'stop' })
+          })
+        } catch (err) {
+          console.error('PTZ Error:', err)
+        }
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+    window.addEventListener('keyup', handleKeyUp)
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown)
+      window.removeEventListener('keyup', handleKeyUp)
+      
+      // Safety: stop movement on unmount/disable
+      if (lastPtzDirection.current && site) {
+        fetch(`http://localhost:3001/api/sites/${site.id}/ptz`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'stop' })
+        }).catch(console.error)
+      }
+    }
+  }, [isPtzEnabled, site])
 
   // Sync external region control
   useEffect(() => {
@@ -606,7 +687,7 @@ export function CameraViewVirtualPTZ({
         )}
 
         {/* Controls Overlay */}
-        <div className="absolute top-0 left-0 right-0 p-3 bg-gradient-to-b from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
+        <div className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Badge variant="secondary" className="gap-1.5">
@@ -643,6 +724,15 @@ export function CameraViewVirtualPTZ({
               <Button
                 variant="ghost"
                 size="icon"
+                className={`h-7 w-7 hover:bg-white/20 ${isPtzEnabled ? "text-green-400 bg-white/10" : "text-white"}`}
+                onClick={() => setIsPtzEnabled(!isPtzEnabled)}
+                title={isPtzEnabled ? "Disable PTZ Control" : "Enable PTZ Control (Arrow Keys)"}
+              >
+                <Move className="size-3.5" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
                 className="h-7 w-7 text-white hover:bg-white/20"
                 onClick={() => setShowDevSettings(true)}
                 title="Developer Settings (Cmd/Ctrl+Shift+D)"
@@ -661,8 +751,8 @@ export function CameraViewVirtualPTZ({
           </div>
         </div>
 
-        {/* Camera Icon when no hover */}
-        <div className="absolute bottom-3 right-3 opacity-50">
+        {/* Camera Icon when no hover (top right now that controls are bottom) */}
+        <div className="absolute top-3 right-3 opacity-50">
           <CameraIcon className="size-4 text-white" />
         </div>
       </div>
