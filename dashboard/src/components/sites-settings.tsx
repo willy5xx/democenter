@@ -395,8 +395,9 @@ export function SitesSettings() {
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="1920x1080">1920x1080 (Full HD)</SelectItem>
-                        <SelectItem value="1280x720">1280x720 (HD)</SelectItem>
+                        <SelectItem value="2560x1440">2560x1440 (2K QHD)</SelectItem>
                         <SelectItem value="3840x2160">3840x2160 (4K)</SelectItem>
+                        <SelectItem value="1280x720">1280x720 (HD)</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>

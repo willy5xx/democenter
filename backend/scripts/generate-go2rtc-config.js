@@ -93,9 +93,22 @@ sites.forEach((site, index) => {
   
   const filterChain = filters.join(',');
   
+  // Calculate dynamic bitrate based on resolution
+  const widthNum = parseInt(width);
+  let maxRate = '8M';
+  let bufSize = '16M';
+  
+  if (widthNum >= 3840) {
+    maxRate = '20M';
+    bufSize = '40M';
+  } else if (widthNum >= 2560) {
+    maxRate = '12M';
+    bufSize = '24M';
+  }
+
   // FFmpeg stream with optimized settings for low latency
   streams[dewarpedStreamName] = [
-    `ffmpeg:${mainStreamName}#video=h264#raw=-fflags nobuffer+genpts -flags low_delay -probesize 32 -analyzeduration 0 -vf ${filterChain} -c:v libx264 -preset superfast -tune zerolatency -crf 17 -maxrate 8M -bufsize 16M -g 30 -bf 0 -x264-params keyint=30:min-keyint=30:scenecut=0:bframes=0:ref=1`
+    `ffmpeg:${mainStreamName}#video=h264#raw=-fflags nobuffer+genpts -flags low_delay -probesize 32 -analyzeduration 0 -vf ${filterChain} -c:v libx264 -preset superfast -tune zerolatency -crf 17 -maxrate ${maxRate} -bufsize ${bufSize} -g 30 -bf 0 -x264-params keyint=30:min-keyint=30:scenecut=0:bframes=0:ref=1`
   ];
 });
 
