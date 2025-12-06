@@ -25,10 +25,6 @@ interface DevSettings {
   transition_duration: number
   show_fps_overlay: boolean
   show_region_boundaries: boolean
-  video_sharpen_amount: number
-  video_contrast: number
-  video_brightness: number
-  video_saturation: number
 }
 
 interface DevSettingsPanelProps {
@@ -49,10 +45,6 @@ export function DevSettingsPanel({ isOpen, onClose }: DevSettingsPanelProps) {
     transition_duration: 300,
     show_fps_overlay: false,
     show_region_boundaries: false,
-    video_sharpen_amount: 0,
-    video_contrast: 100,
-    video_brightness: 100,
-    video_saturation: 100,
   })
   const [isLoading, setIsLoading] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
@@ -76,10 +68,6 @@ export function DevSettingsPanel({ isOpen, onClose }: DevSettingsPanelProps) {
           transition_duration: parseInt(data.data.transition_duration) || 300,
           show_fps_overlay: data.data.show_fps_overlay === 'true',
           show_region_boundaries: data.data.show_region_boundaries === 'true',
-          video_sharpen_amount: parseInt(data.data.video_sharpen_amount) || 0,
-          video_contrast: parseInt(data.data.video_contrast) || 100,
-          video_brightness: parseInt(data.data.video_brightness) || 100,
-          video_saturation: parseInt(data.data.video_saturation) || 100,
         })
       }
     } catch (err) {
@@ -128,12 +116,6 @@ export function DevSettingsPanel({ isOpen, onClose }: DevSettingsPanelProps) {
     await saveSetting(key, value)
   }
 
-  const handleSliderChange = async (key: keyof DevSettings, value: number[]) => {
-    const numValue = value[0]
-    setSettings({ ...settings, [key]: numValue })
-    await saveSetting(key, numValue)
-  }
-
   const handleResetDefaults = async () => {
     setIsSaving(true)
     
@@ -142,10 +124,6 @@ export function DevSettingsPanel({ isOpen, onClose }: DevSettingsPanelProps) {
       transition_duration: 300,
       show_fps_overlay: false,
       show_region_boundaries: false,
-      video_sharpen_amount: 0,
-      video_contrast: 100,
-      video_brightness: 100,
-      video_saturation: 100,
     }
     
     try {
@@ -154,10 +132,6 @@ export function DevSettingsPanel({ isOpen, onClose }: DevSettingsPanelProps) {
         saveSetting('transition_duration', defaults.transition_duration),
         saveSetting('show_fps_overlay', defaults.show_fps_overlay),
         saveSetting('show_region_boundaries', defaults.show_region_boundaries),
-        saveSetting('video_sharpen_amount', defaults.video_sharpen_amount),
-        saveSetting('video_contrast', defaults.video_contrast),
-        saveSetting('video_brightness', defaults.video_brightness),
-        saveSetting('video_saturation', defaults.video_saturation),
       ])
       
       setSettings(defaults)
@@ -245,63 +219,6 @@ export function DevSettingsPanel({ isOpen, onClose }: DevSettingsPanelProps) {
                 <div className="flex justify-between text-xs text-muted-foreground">
                   <span>Instant (0ms)</span>
                   <span>Slow (1000ms)</span>
-                </div>
-              </div>
-
-              {/* Video Enhancements */}
-              <div className="space-y-4 pt-4 border-t">
-                <Label className="text-base font-medium">Video Enhancements</Label>
-
-                {/* Sharpening */}
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <Label className="text-sm font-normal">Sharpening</Label>
-                    <Badge variant="secondary" className="font-mono">{settings.video_sharpen_amount}%</Badge>
-                  </div>
-                  <Slider
-                    min={0} max={100} step={5}
-                    value={[settings.video_sharpen_amount]}
-                    onValueChange={(val) => handleSliderChange('video_sharpen_amount', val)}
-                  />
-                </div>
-
-                {/* Contrast */}
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <Label className="text-sm font-normal">Contrast</Label>
-                    <Badge variant="secondary" className="font-mono">{settings.video_contrast}%</Badge>
-                  </div>
-                  <Slider
-                    min={50} max={150} step={5}
-                    value={[settings.video_contrast]}
-                    onValueChange={(val) => handleSliderChange('video_contrast', val)}
-                  />
-                </div>
-
-                {/* Brightness */}
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <Label className="text-sm font-normal">Brightness</Label>
-                    <Badge variant="secondary" className="font-mono">{settings.video_brightness}%</Badge>
-                  </div>
-                  <Slider
-                    min={50} max={150} step={5}
-                    value={[settings.video_brightness]}
-                    onValueChange={(val) => handleSliderChange('video_brightness', val)}
-                  />
-                </div>
-
-                {/* Saturation */}
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <Label className="text-sm font-normal">Saturation</Label>
-                    <Badge variant="secondary" className="font-mono">{settings.video_saturation}%</Badge>
-                  </div>
-                  <Slider
-                    min={0} max={200} step={10}
-                    value={[settings.video_saturation]}
-                    onValueChange={(val) => handleSliderChange('video_saturation', val)}
-                  />
                 </div>
               </div>
 

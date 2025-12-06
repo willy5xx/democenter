@@ -36,6 +36,10 @@ interface Site {
     k1?: number
     k2?: number
     enable_dewarp?: boolean
+    video_sharpen_amount?: number
+    video_contrast?: number
+    video_brightness?: number
+    video_saturation?: number
   }
   stream_resolution: string
   transition_speed?: number
@@ -161,6 +165,10 @@ export function SitesSettings() {
         cy: 0.5,
         k1: -0.23,
         k2: -0.02,
+        video_sharpen_amount: 0,
+        video_contrast: 100,
+        video_brightness: 100,
+        video_saturation: 100,
       },
       stream_resolution: '1920x1080',
       transition_speed: 300,
@@ -458,7 +466,100 @@ export function SitesSettings() {
                   </div>
                 </div>
 
-                {/* Lens Correction Settings */}
+                  {/* Video Enhancements */}
+                  <div className="space-y-4 pt-4 border-t">
+                    <h3 className="font-semibold text-lg">Video Enhancements</h3>
+                    
+                    {/* Sharpening */}
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <Label className="text-sm font-normal">Sharpening</Label>
+                        <Badge variant="secondary" className="font-mono">
+                          {selectedSite.dewarp_params?.video_sharpen_amount || 0}%
+                        </Badge>
+                      </div>
+                      <Slider
+                        min={0} max={100} step={5}
+                        value={[selectedSite.dewarp_params?.video_sharpen_amount || 0]}
+                        onValueChange={(val) => setSelectedSite({
+                          ...selectedSite,
+                          dewarp_params: {
+                            ...selectedSite.dewarp_params,
+                            video_sharpen_amount: val[0]
+                          }
+                        })}
+                        disabled={!isEditing && !isCreating}
+                      />
+                    </div>
+
+                    {/* Contrast */}
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <Label className="text-sm font-normal">Contrast</Label>
+                        <Badge variant="secondary" className="font-mono">
+                          {selectedSite.dewarp_params?.video_contrast || 100}%
+                        </Badge>
+                      </div>
+                      <Slider
+                        min={50} max={150} step={5}
+                        value={[selectedSite.dewarp_params?.video_contrast || 100]}
+                        onValueChange={(val) => setSelectedSite({
+                          ...selectedSite,
+                          dewarp_params: {
+                            ...selectedSite.dewarp_params,
+                            video_contrast: val[0]
+                          }
+                        })}
+                        disabled={!isEditing && !isCreating}
+                      />
+                    </div>
+
+                    {/* Brightness */}
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <Label className="text-sm font-normal">Brightness</Label>
+                        <Badge variant="secondary" className="font-mono">
+                          {selectedSite.dewarp_params?.video_brightness || 100}%
+                        </Badge>
+                      </div>
+                      <Slider
+                        min={50} max={150} step={5}
+                        value={[selectedSite.dewarp_params?.video_brightness || 100]}
+                        onValueChange={(val) => setSelectedSite({
+                          ...selectedSite,
+                          dewarp_params: {
+                            ...selectedSite.dewarp_params,
+                            video_brightness: val[0]
+                          }
+                        })}
+                        disabled={!isEditing && !isCreating}
+                      />
+                    </div>
+
+                    {/* Saturation */}
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <Label className="text-sm font-normal">Saturation</Label>
+                        <Badge variant="secondary" className="font-mono">
+                          {selectedSite.dewarp_params?.video_saturation || 100}%
+                        </Badge>
+                      </div>
+                      <Slider
+                        min={0} max={200} step={10}
+                        value={[selectedSite.dewarp_params?.video_saturation || 100]}
+                        onValueChange={(val) => setSelectedSite({
+                          ...selectedSite,
+                          dewarp_params: {
+                            ...selectedSite.dewarp_params,
+                            video_saturation: val[0]
+                          }
+                        })}
+                        disabled={!isEditing && !isCreating}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Lens Correction Settings */}
                 <div className="space-y-4 pt-4 border-t">
                   <div className="flex items-center justify-between">
                     <div>

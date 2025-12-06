@@ -22,6 +22,12 @@ interface Site {
   name: string
   camera_url: string
   stream_resolution: string
+  dewarp_params?: {
+    video_sharpen_amount?: number
+    video_contrast?: number
+    video_brightness?: number
+    video_saturation?: number
+  }
 }
 
 interface TransitionStyle {
@@ -104,6 +110,16 @@ export function CameraViewVirtualPTZ({
         if (siteData.success) {
           setSite(siteData.data)
           
+          // Set video settings from site config
+          if (siteData.data.dewarp_params) {
+            setVideoSettings({
+              sharpenAmount: siteData.data.dewarp_params.video_sharpen_amount || 0,
+              contrast: siteData.data.dewarp_params.video_contrast || 100,
+              brightness: siteData.data.dewarp_params.video_brightness || 100,
+              saturation: siteData.data.dewarp_params.video_saturation || 100,
+            })
+          }
+          
           // Set transition duration from site settings (or use default)
           if (siteData.data.transition_speed !== undefined) {
             setTransitionDuration(siteData.data.transition_speed)
@@ -170,11 +186,6 @@ export function CameraViewVirtualPTZ({
         setTransitionDuration(parseInt(value))
       } else if (key === 'show_region_boundaries') {
         setShowROI(value === 'true')
-      } else if (key.startsWith('video_')) {
-        setVideoSettings(prev => ({
-          ...prev,
-          [key.replace('video_', '')]: parseInt(value)
-        }))
       }
     }
     
@@ -196,12 +207,6 @@ export function CameraViewVirtualPTZ({
           setTransitionStyle(data.data.transition_style || 'smooth')
           setTransitionDuration(parseInt(data.data.transition_duration) || 300)
           setShowROI(data.data.show_region_boundaries === 'true')
-          setVideoSettings({
-            sharpenAmount: parseInt(data.data.video_sharpen_amount) || 0,
-            contrast: parseInt(data.data.video_contrast) || 100,
-            brightness: parseInt(data.data.video_brightness) || 100,
-            saturation: parseInt(data.data.video_saturation) || 100,
-          })
         }
       } catch (err) {
         console.error('Error fetching settings:', err)
