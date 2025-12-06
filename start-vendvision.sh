@@ -54,6 +54,9 @@ fi
 
 # 2. Start backend
 echo "🔧 Starting backend API server..."
+# Kill any existing backend process on port 3001
+lsof -ti:3001 | xargs kill -9 2>/dev/null
+sleep 1
 if [[ "$OSTYPE" == "darwin"* ]]; then
     # macOS - open in new tab
     osascript -e 'tell application "Terminal" to do script "cd '"$DIR"'/backend && npm start"' > /dev/null 2>&1
@@ -64,6 +67,10 @@ fi
 
 # 3. Start frontend
 echo "🎨 Starting frontend dashboard..."
+# Kill any existing frontend process on port 5173/5174
+lsof -ti:5173 | xargs kill -9 2>/dev/null
+lsof -ti:5174 | xargs kill -9 2>/dev/null
+sleep 1
 if [[ "$OSTYPE" == "darwin"* ]]; then
     # macOS - open in new tab
     osascript -e 'tell application "Terminal" to do script "cd '"$DIR"'/dashboard && npm run dev"' > /dev/null 2>&1

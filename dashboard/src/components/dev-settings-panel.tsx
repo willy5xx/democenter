@@ -25,6 +25,7 @@ interface DevSettings {
   transition_duration: number
   show_fps_overlay: boolean
   show_region_boundaries: boolean
+  flip_video: boolean
 }
 
 interface DevSettingsPanelProps {
@@ -45,6 +46,7 @@ export function DevSettingsPanel({ isOpen, onClose }: DevSettingsPanelProps) {
     transition_duration: 300,
     show_fps_overlay: false,
     show_region_boundaries: false,
+    flip_video: false,
   })
   const [isLoading, setIsLoading] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
@@ -68,6 +70,7 @@ export function DevSettingsPanel({ isOpen, onClose }: DevSettingsPanelProps) {
           transition_duration: parseInt(data.data.transition_duration) || 300,
           show_fps_overlay: data.data.show_fps_overlay === 'true',
           show_region_boundaries: data.data.show_region_boundaries === 'true',
+          flip_video: data.data.flip_video === 'true',
         })
       }
     } catch (err) {
@@ -124,6 +127,7 @@ export function DevSettingsPanel({ isOpen, onClose }: DevSettingsPanelProps) {
       transition_duration: 300,
       show_fps_overlay: false,
       show_region_boundaries: false,
+      flip_video: false,
     }
     
     try {
@@ -132,6 +136,7 @@ export function DevSettingsPanel({ isOpen, onClose }: DevSettingsPanelProps) {
         saveSetting('transition_duration', defaults.transition_duration),
         saveSetting('show_fps_overlay', defaults.show_fps_overlay),
         saveSetting('show_region_boundaries', defaults.show_region_boundaries),
+        saveSetting('flip_video', defaults.flip_video),
       ])
       
       setSettings(defaults)
@@ -257,6 +262,23 @@ export function DevSettingsPanel({ isOpen, onClose }: DevSettingsPanelProps) {
                     id="region-boundaries"
                     checked={settings.show_region_boundaries}
                     onCheckedChange={(checked) => handleToggle('show_region_boundaries', checked)}
+                  />
+                </div>
+
+                {/* Flip Video Stream */}
+                <div className="flex items-center justify-between">
+                  <div className="space-y-0.5">
+                    <Label htmlFor="flip-video" className="text-sm font-normal">
+                      Flip Video Stream (180°)
+                    </Label>
+                    <p className="text-xs text-muted-foreground">
+                      Rotate video for upside-down cameras
+                    </p>
+                  </div>
+                  <Switch
+                    id="flip-video"
+                    checked={settings.flip_video}
+                    onCheckedChange={(checked) => handleToggle('flip_video', checked)}
                   />
                 </div>
               </div>

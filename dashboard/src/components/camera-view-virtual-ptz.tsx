@@ -73,6 +73,7 @@ export function CameraViewVirtualPTZ({
   const [transitionDuration, setTransitionDuration] = useState<number>(300)
   const [showDevSettings, setShowDevSettings] = useState(false)
   const [isPtzEnabled, setIsPtzEnabled] = useState(false)
+  const [flipVideo, setFlipVideo] = useState(false)
   const lastPtzDirection = useRef<string | null>(null)
   
   // Video enhancements state
@@ -190,6 +191,8 @@ export function CameraViewVirtualPTZ({
         setTransitionDuration(parseInt(value))
       } else if (key === 'show_region_boundaries') {
         setShowROI(value === 'true')
+      } else if (key === 'flip_video') {
+        setFlipVideo(value === 'true')
       }
     }
     
@@ -211,6 +214,7 @@ export function CameraViewVirtualPTZ({
           setTransitionStyle(data.data.transition_style || 'smooth')
           setTransitionDuration(parseInt(data.data.transition_duration) || 300)
           setShowROI(data.data.show_region_boundaries === 'true')
+          setFlipVideo(data.data.flip_video === 'true')
         }
       } catch (err) {
         console.error('Error fetching settings:', err)
@@ -432,7 +436,7 @@ export function CameraViewVirtualPTZ({
             const timeout = setTimeout(() => {
               console.warn("ICE gathering timed out, sending offer anyway")
               resolve()
-            }, 1000) // 1 second timeout is plenty for local only
+            }, 2000) // 3 second timeout to allow for slower gathering
             
             pc!.onicegatheringstatechange = () => {
               if (pc!.iceGatheringState === "complete") {
@@ -679,6 +683,7 @@ export function CameraViewVirtualPTZ({
             style={{ 
               maxWidth: '100%', 
               maxHeight: '100%',
+              transform: flipVideo ? 'rotate(180deg)' : 'none',
               filter: `
                 contrast(${videoSettings.contrast}%) 
                 brightness(${videoSettings.brightness}%) 
@@ -694,7 +699,11 @@ export function CameraViewVirtualPTZ({
           <canvas
             ref={overlayCanvasRef}
             className="absolute inset-0 pointer-events-none"
-            style={{ width: '100%', height: '100%' }}
+            style={{ 
+              width: '100%', 
+              height: '100%',
+              transform: flipVideo ? 'rotate(180deg)' : 'none',
+            }}
           />
         )}
 

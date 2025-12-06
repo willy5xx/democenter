@@ -36,6 +36,30 @@ export function MachineConfigurator() {
   const [currentBox, setCurrentBox] = useState<Partial<MachineBox> | null>(null)
   const [selectedMachine, setSelectedMachine] = useState<string | null>(null)
   const [videoLoaded, setVideoLoaded] = useState(false)
+  const [flipVideo, setFlipVideo] = useState(false)
+  const [siteId, setSiteId] = useState<number | null>(null)
+
+  // Load settings
+  useEffect(() => {
+    fetch('http://localhost:3001/api/settings')
+      .then(res => res.json())
+      .then(data => {
+        if (data.success && data.data.flip_video === 'true') {
+          setFlipVideo(true)
+        }
+      })
+      .catch(err => console.error("Error loading settings:", err))
+
+    // Fetch sites to get the correct stream ID
+    fetch('http://localhost:3001/api/sites')
+      .then(res => res.json())
+      .then(data => {
+        if (data.success && data.data.length > 0) {
+          setSiteId(data.data[0].id)
+        }
+      })
+      .catch(err => console.error("Error loading sites:", err))
+  }, [])
 
   // Load existing machines from config on mount
   useEffect(() => {
@@ -62,6 +86,8 @@ export function MachineConfigurator() {
 
   // WebRTC setup for camera feed
   useEffect(() => {
+    if (!siteId) return
+
     let pc: RTCPeerConnection | null = null
 
     const setupCamera = async () => {
@@ -123,7 +149,8 @@ export function MachineConfigurator() {
         })
 
         console.log("📡 Sending offer to go2rtc...")
-        const response = await fetch("/api/webrtc?src=tapo_dewarped", {
+        const streamName = `site${siteId}_dewarped`
+        const response = await fetch(`/api/webrtc?src=${streamName}`, {
           method: "POST",
           body: pc.localDescription!.sdp,
           headers: { "Content-Type": "application/x-sdp" },
@@ -152,7 +179,7 @@ export function MachineConfigurator() {
         pc.close()
       }
     }
-  }, [])
+  }, [siteId])
 
   // Draw boxes on canvas
   useEffect(() => {
@@ -201,10 +228,10 @@ export function MachineConfigurator() {
 
       // Draw existing machine boxes
       machines.forEach((machine) => {
-        const x = machine.x < 0 ? machine.x + machine.width : machine.x
-        const y = machine.y < 0 ? machine.y + machine.height : machine.y
         const w = Math.abs(machine.width)
         const h = Math.abs(machine.height)
+        const x = machine.width < 0 ? machine.x + machine.width : machine.x
+        const y = machine.height < 0 ? machine.y + machine.height : machine.y
 
         ctx.strokeStyle = machine.color
         ctx.lineWidth = 4
@@ -223,10 +250,10 @@ export function MachineConfigurator() {
 
       // Draw current box being drawn
       if (isDrawing && currentBox && currentBox.x !== undefined && currentBox.y !== undefined && currentBox.width && currentBox.height) {
-        const x = currentBox.x < 0 ? currentBox.x + currentBox.width : currentBox.x
-        const y = currentBox.y < 0 ? currentBox.y + currentBox.height : currentBox.y
         const w = Math.abs(currentBox.width)
         const h = Math.abs(currentBox.height)
+        const x = currentBox.width < 0 ? currentBox.x + currentBox.width : currentBox.x
+        const y = currentBox.height < 0 ? currentBox.y + currentBox.height : currentBox.y
 
         ctx.strokeStyle = "#22c55e"
         ctx.lineWidth = 4
@@ -251,8 +278,13 @@ export function MachineConfigurator() {
     if (!canvas) return
 
     const rect = canvas.getBoundingClientRect()
-    const x = ((e.clientX - rect.left) / rect.width) * canvas.width
-    const y = ((e.clientY - rect.top) / rect.height) * canvas.height
+    let x = ((e.clientX - rect.left) / rect.width) * canvas.width
+    let y = ((e.clientY - rect.top) / rect.height) * canvas.height
+
+    if (flipVideo) {
+      x = canvas.width - x
+      y = canvas.height - y
+    }
 
     setIsDrawing(true)
     setCurrentBox({ x, y, width: 0, height: 0 })
@@ -263,8 +295,13 @@ export function MachineConfigurator() {
 
     const canvas = canvasRef.current
     const rect = canvas.getBoundingClientRect()
-    const currentX = ((e.clientX - rect.left) / rect.width) * canvas.width
-    const currentY = ((e.clientY - rect.top) / rect.height) * canvas.height
+    let currentX = ((e.clientX - rect.left) / rect.width) * canvas.width
+    let currentY = ((e.clientY - rect.top) / rect.height) * canvas.height
+
+    if (flipVideo) {
+      currentX = canvas.width - currentX
+      currentY = canvas.height - currentY
+    }
 
     setCurrentBox({
       ...currentBox,
@@ -324,8 +361,8 @@ export function MachineConfigurator() {
         crop: {
           width: Math.abs(Math.round(machine.width)),
           height: Math.abs(Math.round(machine.height)),
-          x: Math.round(machine.x < 0 ? machine.x + machine.width : machine.x),
-          y: Math.round(machine.y < 0 ? machine.y + machine.height : machine.y),
+          x: Math.round(machine.width < 0 ? machine.x + machine.width : machine.x),
+          y: Math.round(machine.height < 0 ? machine.y + machine.height : machine.y),
         }
       }))
 
@@ -405,6 +442,7 @@ export function MachineConfigurator() {
                 width={1920}
                 height={1080}
                 className="w-full rounded-lg border-2 border-muted cursor-crosshair"
+                style={{ transform: flipVideo ? 'rotate(180deg)' : 'none' }}
                 onMouseDown={handleMouseDown}
                 onMouseMove={handleMouseMove}
                 onMouseUp={handleMouseUp}
