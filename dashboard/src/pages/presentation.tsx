@@ -4,7 +4,8 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { CameraViewVirtualPTZ } from "@/components/camera-view-virtual-ptz"
 import { SiteSelector } from "@/components/site-selector"
-import { Maximize, Settings, Monitor } from "lucide-react"
+import { Maximize, Settings, Monitor, Video, VideoOff, Loader2 } from "lucide-react"
+import { toast } from "sonner"
 
 // Custom Vending Machine Icon
 const VendingMachineIcon = ({ className }: { className?: string }) => (
@@ -50,6 +51,56 @@ export function PresentationPage() {
   const [machineRegions, setMachineRegions] = useState<MachineRegion[]>([])
   const [currentRegionId, setCurrentRegionId] = useState<number | null>(null)
   const [showControls, setShowControls] = useState(false)
+  const [obsConnected, setObsConnected] = useState(false)
+  const [virtualCamActive, setVirtualCamActive] = useState(false)
+  const [obsLoading, setObsLoading] = useState(false)
+
+  // Check OBS status periodically
+  useEffect(() => {
+    const checkObsStatus = async () => {
+      try {
+        const res = await fetch('/api/obs/status')
+        const data = await res.json()
+        
+        if (data.success && data.obs) {
+          setObsConnected(data.obs.connected)
+          setVirtualCamActive(data.obs.virtualCamActive)
+        }
+      } catch (err) {
+        console.error('Error checking OBS status:', err)
+        setObsConnected(false)
+      }
+    }
+
+    checkObsStatus()
+    const interval = setInterval(checkObsStatus, 5000)
+    return () => clearInterval(interval)
+  }, [])
+
+  const toggleVirtualCam = async () => {
+    setObsLoading(true)
+    try {
+      const action = virtualCamActive ? 'stop' : 'start'
+      const res = await fetch('/api/obs/virtual-cam', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action })
+      })
+      
+      const data = await res.json()
+      if (data.success) {
+        setVirtualCamActive(action === 'start')
+        toast.success(`Virtual Camera ${action === 'start' ? 'Started' : 'Stopped'}`)
+      } else {
+        toast.error(`Failed: ${data.error}`)
+      }
+    } catch (err) {
+      console.error('Error toggling virtual cam:', err)
+      toast.error('Failed to communicate with OBS')
+    } finally {
+      setObsLoading(false)
+    }
+  }
 
   // Fetch machine regions when siteId changes
   useEffect(() => {
@@ -195,6 +246,32 @@ export function PresentationPage() {
 
         {/* Right: System Controls */}
         <div className="flex items-center gap-2 flex-1 justify-end">
+          {/* OBS Virtual Cam Toggle */}
+          {obsConnected && (
+            <Button
+              variant={virtualCamActive ? "secondary" : "outline"}
+              size="sm"
+              onClick={toggleVirtualCam}
+              disabled={obsLoading}
+              className={`h-9 gap-2 min-w-[100px] transition-all ${
+                virtualCamActive 
+                  ? "bg-red-500/20 text-red-200 hover:bg-red-500/30 border-red-500/50" 
+                  : "bg-green-500/10 text-green-200 hover:bg-green-500/20 border-green-500/30"
+              }`}
+            >
+              {obsLoading ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : virtualCamActive ? (
+                <VideoOff className="h-4 w-4" />
+              ) : (
+                <Video className="h-4 w-4" />
+              )}
+              <span className="text-xs font-medium">
+                {virtualCamActive ? "Stop Cam" : "Start Cam"}
+              </span>
+            </Button>
+          )}
+
           <div className="bg-black/40 rounded-md border border-white/10 px-2 py-0.5">
             <SiteSelector 
               value={siteId} 

@@ -94,6 +94,11 @@ RecEncoder=obs_x264
 FFOutputToFile=true
 FFFormat=
 FFFormatMimeType=
+
+[ObsWebSocket]
+ServerEnabled=true
+ServerPort=4455
+ServerPassword=vendvision
 EOF
 
 echo "✅ Created vendVision profile"

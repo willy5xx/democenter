@@ -20,6 +20,8 @@ import {
   main as setupOBS
 } from '../scripts/setup-obs.js';
 
+import { obsService } from '../services/obs-service.js';
+
 /**
  * GET /api/obs/status
  * Check OBS installation and running status
@@ -29,6 +31,12 @@ router.get('/status', async (req, res) => {
     const installed = isOBSInstalled();
     const running = isOBSRunning();
     const configDir = installed ? getOBSConfigDir() : null;
+    
+    // Check connection and virtual camera status
+    let virtualCam = { active: false, connected: false };
+    if (running) {
+      virtualCam = await obsService.getVirtualCamStatus();
+    }
     
     let configured = false;
     if (configDir) {
@@ -47,7 +55,9 @@ router.get('/status', async (req, res) => {
         installed,
         running,
         configured,
-        configDir
+        configDir,
+        connected: virtualCam.connected,
+        virtualCamActive: virtualCam.active
       }
     });
   } catch (error) {
@@ -55,6 +65,36 @@ router.get('/status', async (req, res) => {
       success: false,
       error: error.message
     });
+  }
+});
+
+/**
+ * POST /api/obs/virtual-cam
+ * Control the virtual camera (start/stop)
+ * Body: { action: 'start' | 'stop' }
+ */
+router.post('/virtual-cam', async (req, res) => {
+  try {
+    const { action } = req.body;
+    
+    if (!isOBSRunning()) {
+       return res.status(400).json({ 
+         success: false, 
+         error: 'OBS is not running. Please launch OBS first.' 
+       });
+    }
+
+    if (action === 'start') {
+      await obsService.startVirtualCam();
+    } else if (action === 'stop') {
+      await obsService.stopVirtualCam();
+    } else {
+      return res.status(400).json({ success: false, error: 'Invalid action. Use "start" or "stop".' });
+    }
+
+    res.json({ success: true, action });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
   }
 });
 

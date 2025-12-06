@@ -389,9 +389,11 @@ export function CameraViewVirtualPTZ({
           pcRef.current.close()
         }
 
-        // Create peer connection with STUN server
+        // Create peer connection - Use STUN for Tailscale/Remote access support
+        // We need STUN to traverse NAT/VPN interfaces correctly
         pc = new RTCPeerConnection({
           iceServers: [{ urls: "stun:stun.l.google.com:19302" }],
+          iceTransportPolicy: 'all'
         })
 
         pcRef.current = pc
@@ -421,13 +423,20 @@ export function CameraViewVirtualPTZ({
         const offer = await pc.createOffer()
         await pc.setLocalDescription(offer)
 
-        // Wait for ICE gathering to complete (CRITICAL FIX!)
+        // Wait for ICE gathering to complete, but with a timeout
+        // Since we removed STUN, this should be nearly instant
         await new Promise<void>((resolve) => {
           if (pc!.iceGatheringState === "complete") {
             resolve()
           } else {
+            const timeout = setTimeout(() => {
+              console.warn("ICE gathering timed out, sending offer anyway")
+              resolve()
+            }, 1000) // 1 second timeout is plenty for local only
+            
             pc!.onicegatheringstatechange = () => {
               if (pc!.iceGatheringState === "complete") {
+                clearTimeout(timeout)
                 resolve()
               }
             }
@@ -451,6 +460,14 @@ export function CameraViewVirtualPTZ({
 
         // Set remote description
         const answer = await response.text()
+        
+        // CRITICAL: Check if connection is still open before setting remote description
+        // This prevents "InvalidStateError: ... signalingState is 'closed'" race conditions
+        if (pc.signalingState === 'closed') {
+          console.warn("Connection closed before remote description could be set")
+          return
+        }
+
         await pc.setRemoteDescription({
           type: "answer",
           sdp: answer,
@@ -458,6 +475,9 @@ export function CameraViewVirtualPTZ({
 
         console.log("WebRTC connection established")
       } catch (err) {
+        // Ignore errors if connection was intentionally closed
+        if (pc && pc.signalingState === 'closed') return
+        
         console.error("Error starting stream:", err)
         setError(err instanceof Error ? err.message : "Failed to start stream")
         setIsLoading(false)
