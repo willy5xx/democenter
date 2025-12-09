@@ -12,7 +12,7 @@ This is the **Demo Dashboard** - designed specifically for showing potential cus
 
 ```bash
 # Easiest way - from project root:
-./start-vendvision.sh
+./start_vendvision_ext.sh
 
 # Or manually:
 # Terminal 1: Start go2rtc

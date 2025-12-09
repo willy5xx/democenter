@@ -246,7 +246,7 @@ fi
 echo ""
 echo "✅ Setup Complete!"
 echo ""
-echo "Run ./start-vendvision.sh to launch the demo center."
+echo "Run ./start_vendvision_ext.sh to launch the demo center."
 echo ""
 
 # Show Tailscale IP if available

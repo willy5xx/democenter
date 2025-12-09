@@ -107,7 +107,7 @@ pkill go2rtc
 
 Or simply restart everything:
 ```bash
-./start-vendvision.sh
+./start_vendvision_ext.sh
 ```
 
 ### 4. Verify the Streams
@@ -168,6 +168,7 @@ const streamName = `site${site.id}_dewarped`
 ```
 
 The backend must generate matching stream names in `go2rtc.yaml`. Always use the `site${id}_` prefix for consistency, even in single-site deployments.
+
 
 
 

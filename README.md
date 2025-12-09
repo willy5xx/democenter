@@ -10,12 +10,12 @@ Interactive camera dashboard for showcasing vendVision capabilities. Set up your
 ```bash
 ./setup-demo.sh          # Enter camera IP, username, password when prompted
 ./verify-setup.sh        # Check everything is configured
-./start-vendvision.sh    # Start the demo
+./start_vendvision_ext.sh    # Start the demo
 ```
 
 **Every Other Time:**
 ```bash
-./start-vendvision.sh    # Just run this!
+./start_vendvision_ext.sh    # Just run this!
 ```
 
 **Dashboard:** http://localhost:5173  
@@ -64,7 +64,7 @@ This checks that everything is configured correctly before starting.
 ### 4. Start the Demo Center
 
 ```bash
-./start-vendvision.sh
+./start_vendvision_ext.sh
 ```
 
 That's it! The dashboard will open at **http://localhost:5173**
@@ -97,7 +97,7 @@ After starting, check that the camera stream is working:
 
 Just run:
 ```bash
-./start-vendvision.sh
+./start_vendvision_ext.sh
 ```
 
 To stop everything, press `Ctrl+C` in the terminal.
@@ -114,7 +114,7 @@ OBS Studio creates a virtual camera that lets you share your vendVision dashboar
 ./setup-obs.sh
 ```
 
-When you run `./start-vendvision.sh`, OBS will launch automatically. Just click **"Start Virtual Camera"** in OBS, then select "OBS Virtual Camera" in your Zoom video settings.
+When you run `./start_vendvision_ext.sh`, OBS will launch automatically. Just click **"Start Virtual Camera"** in OBS, then select "OBS Virtual Camera" in your Zoom video settings.
 
 See `docs/ZOOM_VIRTUAL_CAMERA_GUIDE.md` for detailed instructions.
 
@@ -142,7 +142,7 @@ streams:
 ```
 vendvision-demo-center/
 ├── setup-demo.sh           # First-time setup
-├── start-vendvision.sh     # Daily launcher
+├── start_vendvision_ext.sh     # Daily launcher
 ├── setup-obs.sh            # OBS configuration
 ├── go2rtc.yaml             # Stream configuration
 ├── backend/                # Node.js API server
@@ -259,7 +259,7 @@ lsof -i :1984
 pkill go2rtc
 
 # Start it again
-./start-vendvision.sh
+./start_vendvision_ext.sh
 ```
 
 ### Backend errors?

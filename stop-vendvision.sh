@@ -49,6 +49,6 @@ fi
 echo ""
 echo "✅ All vendVision services stopped!"
 echo ""
-echo "To restart, run: ./start-vendvision.sh"
+echo "To restart, run: ./start_vendvision_ext.sh"
 echo ""
 

@@ -28,7 +28,7 @@ This automation system configures OBS Studio to capture your vendVision browser 
 Choose one of three methods:
 
 #### **Option A: Dashboard UI (Easiest)**
-1. Start vendVision: `../start-vendvision.sh`
+1. Start vendVision: `../start_vendvision_ext.sh`
 2. Open dashboard: `http://localhost:5173/admin`
 3. Click the "OBS Setup" tab
 4. Click "Auto-Configure OBS"

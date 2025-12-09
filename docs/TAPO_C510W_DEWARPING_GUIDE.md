@@ -25,7 +25,7 @@ These values are optimized for the C510W's mild fisheye lens and will straighten
 ### Step 1: Open the Admin Panel
 ```bash
 # Make sure your system is running
-../start-vendvision.sh
+../start_vendvision_ext.sh
 
 # Then open in your browser:
 http://localhost:5173/admin/sites

@@ -4,7 +4,7 @@
 
 ```bash
 # Easiest way - use the startup script:
-./start-vendvision.sh
+./start_vendvision_ext.sh
 
 # Or manually:
 # 1. Start go2rtc

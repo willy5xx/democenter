@@ -84,7 +84,7 @@ if pgrep go2rtc > /dev/null; then
     echo "    Admin: http://localhost:1984"
 else
     echo "  ⓘ go2rtc is not running (this is OK if you haven't started yet)"
-    echo "    Run: ./start-vendvision.sh"
+    echo "    Run: ./start_vendvision_ext.sh"
 fi
 
 # Check OBS installation (for Zoom demos)
@@ -138,7 +138,7 @@ if [ $ERRORS -eq 0 ]; then
     echo "✅ All checks passed!"
     echo ""
     echo "Next steps:"
-    echo "  1. Run: ./start-vendvision.sh"
+    echo "  1. Run: ./start_vendvision_ext.sh"
     echo "  2. Open: http://localhost:5173"
     echo "  3. Verify camera at: http://localhost:1984"
 else

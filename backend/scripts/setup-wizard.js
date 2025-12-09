@@ -92,7 +92,7 @@ function finalize() {
     execSync(`node "${generateScript}"`, { stdio: 'inherit' });
     
     console.log('\n🎉 Setup Complete!');
-    console.log('You can now run ./start-vendvision.sh to start the demo center.');
+    console.log('You can now run ./start_vendvision_ext.sh to start the demo center.');
     process.exit(0);
   } catch (e) {
     console.error('⚠️ Could not auto-generate go2rtc config:', e.message);
