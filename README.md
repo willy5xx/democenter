@@ -10,12 +10,21 @@ Interactive camera dashboard for showcasing vendVision capabilities. Set up your
 ```bash
 ./setup-demo.sh          # Enter camera IP, username, password when prompted
 ./verify-setup.sh        # Check everything is configured
-./start_vendvision_ext.sh    # Start the demo
 ```
 
-**Every Other Time:**
+**Every Other Time - Choose Your Script:**
+
+| Script | Use Case |
+|--------|----------|
+| `./start_vendvision_local.sh` | **Local demos** - Office presentations, no remote access needed |
+| `./start_vendvision_ext.sh` | **External demos** - Includes Tailscale for remote access over VPN |
+
 ```bash
-./start_vendvision_ext.sh    # Just run this!
+# For local office demos (faster startup):
+./start_vendvision_local.sh
+
+# For remote/external demos (includes Tailscale):
+./start_vendvision_ext.sh
 ```
 
 **Dashboard:** http://localhost:5173  
@@ -64,6 +73,10 @@ This checks that everything is configured correctly before starting.
 ### 4. Start the Demo Center
 
 ```bash
+# For local office demos (no Tailscale):
+./start_vendvision_local.sh
+
+# For external demos with remote access (includes Tailscale):
 ./start_vendvision_ext.sh
 ```
 
@@ -95,9 +108,10 @@ After starting, check that the camera stream is working:
 
 ## 🔧 Daily Usage
 
-Just run:
+Just run one of these:
 ```bash
-./start_vendvision_ext.sh
+./start_vendvision_local.sh   # Local demos (faster, no Tailscale)
+./start_vendvision_ext.sh     # External demos (with Tailscale remote access)
 ```
 
 To stop everything, press `Ctrl+C` in the terminal.
@@ -114,7 +128,7 @@ OBS Studio creates a virtual camera that lets you share your vendVision dashboar
 ./setup-obs.sh
 ```
 
-When you run `./start_vendvision_ext.sh`, OBS will launch automatically. Just click **"Start Virtual Camera"** in OBS, then select "OBS Virtual Camera" in your Zoom video settings.
+When you run either startup script (`./start_vendvision_local.sh` or `./start_vendvision_ext.sh`), OBS will launch automatically. Just click **"Start Virtual Camera"** in OBS, then select "OBS Virtual Camera" in your Zoom video settings.
 
 See `docs/ZOOM_VIRTUAL_CAMERA_GUIDE.md` for detailed instructions.
 
@@ -141,17 +155,18 @@ streams:
 
 ```
 vendvision-demo-center/
-├── setup-demo.sh           # First-time setup
-├── start_vendvision_ext.sh     # Daily launcher
-├── setup-obs.sh            # OBS configuration
-├── go2rtc.yaml             # Stream configuration
-├── backend/                # Node.js API server
-│   ├── db/                 # SQLite database
-│   └── routes/             # API endpoints
-└── dashboard/              # React frontend
+├── setup-demo.sh              # First-time setup
+├── start_vendvision_local.sh  # Local demos (no Tailscale)
+├── start_vendvision_ext.sh    # External demos (with Tailscale)
+├── setup-obs.sh               # OBS configuration
+├── go2rtc.yaml                # Stream configuration
+├── backend/                   # Node.js API server
+│   ├── db/                    # SQLite database
+│   └── routes/                # API endpoints
+└── dashboard/                 # React frontend
     └── src/
-        ├── components/     # UI components
-        └── pages/          # Page views
+        ├── components/        # UI components
+        └── pages/             # Page views
 ```
 
 ---
