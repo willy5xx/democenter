@@ -8,6 +8,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Switch } from "@/components/ui/switch"
 import { Slider } from "@/components/ui/slider"
 import { AdminNav } from "@/components/admin-nav"
+import { AutoDewarpModal } from "@/components/auto-dewarp-modal"
 import { 
   Save, 
   Plus, 
@@ -17,7 +18,8 @@ import {
   Settings,
   Camera,
   RefreshCw,
-  Zap
+  Zap,
+  Wand2
 } from "lucide-react"
 import {
   Select,
@@ -50,6 +52,7 @@ export function AdminSitesPage() {
   const [isCreating, setIsCreating] = useState(false)
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'success' | 'error'>('idle')
   const [statusMessage, setStatusMessage] = useState('')
+  const [showAutoDewarpModal, setShowAutoDewarpModal] = useState(false)
 
   // Fetch sites
   useEffect(() => {
@@ -475,6 +478,19 @@ export function AdminSitesPage() {
                       </Badge>
                     </div>
 
+                    {/* Auto-Detect Button */}
+                    {(isEditing || isCreating) && (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        className="w-full"
+                        onClick={() => setShowAutoDewarpModal(true)}
+                      >
+                        <Wand2 className="h-4 w-4 mr-2" />
+                        Auto-Detect Dewarp Settings
+                      </Button>
+                    )}
+
                     {enableDewarp && (isEditing || isCreating) && (
                       <details className="space-y-4">
                         <summary className="cursor-pointer text-sm text-muted-foreground hover:text-foreground">
@@ -622,6 +638,25 @@ export function AdminSitesPage() {
           </div>
         </div>
       </div>
+
+      {/* Auto-Dewarp Modal */}
+      {selectedSite && (
+        <AutoDewarpModal
+          open={showAutoDewarpModal}
+          onOpenChange={setShowAutoDewarpModal}
+          siteId={selectedSite.id}
+          siteName={selectedSite.name}
+          currentParams={selectedSite.dewarp_params || { enable_dewarp: false, cx: 0.5, cy: 0.5, k1: 0, k2: 0 }}
+          onApply={(params) => {
+            setSelectedSite({
+              ...selectedSite,
+              dewarp_params: params,
+              camera_type: 'fisheye' // Auto-switch to fisheye type when auto-detecting
+            })
+            setShowAutoDewarpModal(false)
+          }}
+        />
+      )}
     </div>
   )
 }
